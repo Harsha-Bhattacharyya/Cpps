@@ -36,9 +36,9 @@ class Lexer {
   std::condition_variable QueueCV;
   std::atomic<bool> Done{false};
 
-  TokenType lexIdentifierOrKeyword(const char *TokStart);
-  TokenType lexNumber(const char *TokStart);
-  TokenType lexOperatorOrPunctuator(const char *TokStart);
+  TokenType lexIdentifierOrKeyword(const char *TokStart, const char *&CurPtr);
+  TokenType lexNumber(const char *TokStart, const char *&CurPtr);
+  TokenType lexOperatorOrPunctuator(const char *TokStart, const char *&CurPtr);
 
 public:
   Lexer(const llvm::SourceMgr &SM, llvm::StringRef Buffer)
@@ -49,7 +49,7 @@ public:
   std::queue<Token> &getTokenQueue();
   std::mutex &getQueueMutex();
   std::condition_variable &getQueueCV();
-  std::atomic<bool> &isDone(); // Return a reference to the atomic<bool>
+  std::atomic<bool> &isDone();
 };
 
 #endif // LEXER_H

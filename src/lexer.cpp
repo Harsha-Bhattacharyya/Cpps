@@ -2,25 +2,20 @@
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/raw_ostream.h"
 
-TokenType Lexer::lexIdentifierOrKeyword(const char *TokStart) {
-  const char *CurPtr = TokStart;
-  while (CurPtr < Buffer.end() && (isalnum(*CurPtr) || *CurPtr == '_'))
+TokenType Lexer::lexIdentifierOrKeyword(const char *TokStart,
+                                        const char *&CurPtr) {
+  CurPtr = TokStart;
+  while (CurPtr < Buffer.end() && (isalnum(*CurPtr) || *CurPtr == '_')) {
     ++CurPtr;
+  }
   llvm::StringRef Token(TokStart, CurPtr - TokStart);
-
   return llvm::StringSwitch<TokenType>(Token)
-      .Cases("if", "else", "for", "while", KEYWORD)
-      .Cases("int", "float", "string", "void", KEYWORD)
-      .Cases("return", "auto", "const", "case", KEYWORD)
-      .Cases("class", "private", "public", "default", KEYWORD)
-      .Cases("break", "enum", "static", "sizeof", KEYWORD)
-      .Cases("do", "delete", "try", "catch", KEYWORD)
-      .Case("throw", KEYWORD)
+      .Cases("int", "float", "return", "if", "else", "for", "while", KEYWORD)
       .Default(IDENTIFIER);
 }
 
-TokenType Lexer::lexNumber(const char *TokStart) {
-  const char *CurPtr = TokStart;
+TokenType Lexer::lexNumber(const char *TokStart, const char *&CurPtr) {
+  CurPtr = TokStart;
   bool HasDot = false;
   while (CurPtr < Buffer.end() && (isdigit(*CurPtr) || *CurPtr == '.')) {
     if (*CurPtr == '.') {
@@ -36,9 +31,9 @@ TokenType Lexer::lexNumber(const char *TokStart) {
   return HasDot ? FLOAT_LITERAL : INTEGER_LITERAL;
 }
 
-TokenType Lexer::lexOperatorOrPunctuator(const char *TokStart) {
-  const char *CurPtr = TokStart;
-  // Check for multi-character operators
+TokenType Lexer::lexOperatorOrPunctuator(const char *TokStart,
+                                         const char *&CurPtr) {
+  CurPtr = TokStart;
   if (CurPtr + 1 < Buffer.end()) {
     llvm::StringRef TwoChar(TokStart, 2);
     if (TwoChar == "+=" || TwoChar == "-=" || TwoChar == "*=" ||
@@ -47,36 +42,17 @@ TokenType Lexer::lexOperatorOrPunctuator(const char *TokStart) {
       return OPERATOR;
     }
   }
-
-  // Single-character operators/punctuators
-  char C = *CurPtr++;
-  switch (C) {
-  case '(':
-  case ')':
-    return PUNCTUATOR;
-  case '+':
-  case '-':
-  case '*':
-  case '/':
-  case '<':
-  case '>':
-  case '=':
-  case '!':
-  case '&':
-  case '|':
-  case '%':
-    return OPERATOR;
-  default:
-    return ispunct(C) ? PUNCTUATOR : UNKNOWN;
-  }
+  ++CurPtr;
+  return ispunct(*TokStart) ? OPERATOR : UNKNOWN;
 }
+
 void Lexer::tokenizeChunk(const char *Start, const char *End) {
   const char *CurPtr = Start;
   int Row = 1;
   int Column = 1;
 
   while (CurPtr < End) {
-    // Skip whitespace and update row/column
+    // Skip whitespace
     while (CurPtr < End && isspace(*CurPtr)) {
       if (*CurPtr == '\n') {
         Row++;
@@ -93,17 +69,15 @@ void Lexer::tokenizeChunk(const char *Start, const char *End) {
     TokenType type = UNKNOWN;
 
     if (isalpha(*CurPtr) || *CurPtr == '_') {
-      type = lexIdentifierOrKeyword(TokStart);
+      type = lexIdentifierOrKeyword(TokStart, CurPtr);
     } else if (isdigit(*CurPtr)) {
-      type = lexNumber(TokStart);
+      type = lexNumber(TokStart, CurPtr);
     } else if (ispunct(*CurPtr)) {
-      type = lexOperatorOrPunctuator(TokStart);
+      type = lexOperatorOrPunctuator(TokStart, CurPtr);
     } else {
-      // Handle unknown characters
-      ++CurPtr;
-      Column++;
-      SM.PrintMessage(llvm::SMLoc::getFromPointer(TokStart),
+      SM.PrintMessage(llvm::SMLoc::getFromPointer(CurPtr),
                       llvm::SourceMgr::DK_Error, "Invalid character");
+      ++CurPtr; // Skip invalid character
     }
 
     if (type != UNKNOWN) {
@@ -114,8 +88,7 @@ void Lexer::tokenizeChunk(const char *Start, const char *End) {
         TokenQueue.push(token);
         llvm::errs() << "Lexer produced token: " << token.lexeme << "\n";
       }
-      QueueCV.notify_one();
-      Column += (CurPtr - TokStart); // Update column after token
+      Column += (CurPtr - TokStart);
     }
   }
 }
@@ -130,6 +103,7 @@ void Lexer::startLexerThreads() {
   llvm::errs() << "Lexer done.\n";
   QueueCV.notify_all();
 }
+
 std::queue<Token> &Lexer::getTokenQueue() { return TokenQueue; }
 
 std::mutex &Lexer::getQueueMutex() { return QueueMutex; }
