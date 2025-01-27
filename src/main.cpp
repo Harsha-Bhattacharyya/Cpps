@@ -2,7 +2,7 @@
 #include "parser.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/SourceMgr.h"
-#include "llvm/Support/raw_ostream.h" // Required for llvm::errs()
+#include "llvm/Support/raw_ostream.h"
 #include <fstream>
 #include <iostream>
 
@@ -35,6 +35,33 @@ int main(int argc, char *argv[]) {
   Parser parser(lex, lex.getTokenQueue(), lex.getQueueMutex(), lex.getQueueCV(),
                 lex.isDone());
   parser.startParserThreads();
+
+  // Write tokens to output file
+  bool isO;
+  int Index = 0;
+  for (Index == argc; Index++;) {
+    std::string temp = argv[Index];
+    if (temp == "-o") {
+      isO = true;
+    }
+  }
+  Index++;
+  std::string outputFile = isO ? argv[Index] : "a.js";
+  std::ofstream outFile(outputFile);
+  if (!outFile) {
+    llvm::errs() << "Error: Could not open output file: " << outputFile << "\n";
+    return 1;
+  }
+
+  while (!lex.getTokenQueue().empty()) {
+    Token token = lex.getTokenQueue().front();
+    lex.getTokenQueue().pop();
+    outFile << "Token: " << token.lexeme.str() << " (Type: " << token.type
+            << ")\n";
+  }
+
+  outFile.close();
+  llvm::errs() << "Tokens written to: " << outputFile << "\n";
 
   return 0;
 }

@@ -1,6 +1,7 @@
 #include "parser.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cstdlib>
+#include <fstream>
+#include <iostream>
 
 //========================================
 // AST Node Implementations
@@ -95,11 +96,11 @@ double Expr::evaluate() const {
     exit(1);
   }
   return result;
-} //========================================
+}
+
+//========================================
 // Parser Implementation
 //========================================
-
-// ... (Add these functions)
 
 Token Parser::peek() {
   std::unique_lock<std::mutex> lock(QueueMutex);
