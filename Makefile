@@ -12,7 +12,7 @@ SRCS = $(SRC_DIR)/lexer.cpp $(SRC_DIR)/parser.cpp $(SRC_DIR)/main.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 # Executable
-TARGET = CustomLexerParser
+TARGET = cpps
 
 all: $(TARGET)
 
