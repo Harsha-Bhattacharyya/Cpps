@@ -1,1 +1,8 @@
 #GITIGNORE
+
+input.cpps
+a.js
+cpps
+src/lexer.o
+src/parser.o
+src/main.o
