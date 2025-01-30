@@ -6,7 +6,8 @@
 <div style="text-align: center;">
 <h1 style="text-align: center;">CppScript</h1>
 
-[](logo.png)
+<img src="logo.png" alt="LOGO" /> 
+
 Cppscript is a powerful, high-performance language designed to provide a C++-like experience, while seamlessly compiling into optimized JavaScript code.
 
 
