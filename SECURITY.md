@@ -1,3 +1,8 @@
+| Component       | Author                | License                        |
+|-----------------|-----------------------|--------------------------------|
+| Project Code    | Harsha Bhattacharyya  | BSD-2-Clause Plus Patent      |
+| markdown files     | Harsha Bhattacharyya  | GNU Free Documentation License (GFDL) |
+
 1. Vulnerability Reporting
 We encourage responsible disclosure of security vulnerabilities. To report a vulnerability, please follow these steps:
  * Create a Private Issue:

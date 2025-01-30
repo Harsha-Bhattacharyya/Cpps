@@ -1,3 +1,8 @@
+| Contributor/Organization | License/Policy          |
+|--------------------------|-------------------------|
+| GitHub, Inc.             | [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| Contributor Covenant     | [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+
 # Contributor Covenant Code of Conduct
 
 ## Our Pledge

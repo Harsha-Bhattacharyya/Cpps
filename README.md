@@ -1,13 +1,18 @@
+| Component       | Author                | License                        |
+|-----------------|-----------------------|--------------------------------|
+| Project Code    | Harsha Bhattacharyya  | BSD-2-Clause Plus Patent      |
+| markdown files     | Harsha Bhattacharyya  | GNU Free Documentation License (GFDL) |
+
 <div style="text-align: center;">
 <h1 style="text-align: center;">CppScript</h1>
 
-[](https://gitlab.com/somnathbhattacharyya510/CppScript/-/blob/Master/logo.png)
+[](logo.png)
 Cppscript is a powerful, high-performance language designed to provide a C++-like experience, while seamlessly compiling into optimized JavaScript code.
-</div>
+
 
 ### License:
 
-We use the Apache 2.0 license.
+We use the BSD 2 Clause Plus Patent license for the project but all '.md' files are licensed under the GFDL.
 
 ### Dev phase:
 
@@ -22,3 +27,5 @@ You just need to run the install script.
 #### Discord:https://discord.gg/zCB83CKBce
 
 #                THANKS!
+
+</div>

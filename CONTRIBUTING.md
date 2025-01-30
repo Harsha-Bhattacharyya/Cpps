@@ -1,3 +1,8 @@
+| Component       | Author                | License                        |
+|-----------------|-----------------------|--------------------------------|
+| Project Code    | Harsha Bhattacharyya  | BSD-2-Clause Plus Patent      |
+| markdown files     | Harsha Bhattacharyya  | GNU Free Documentation License (GFDL) |
+
 # Contributing
 ### Getting Started
  - Fork the Repository: Create your own copy of the project.
