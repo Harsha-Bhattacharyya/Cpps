@@ -6,3 +6,5 @@ cpps
 src/lexer.o
 src/parser.o
 src/main.o
+repo-to-text_*.txt
+eigen-*
