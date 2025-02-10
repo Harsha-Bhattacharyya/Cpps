@@ -12,7 +12,7 @@
 
 # Compiler and flags
 CXX = clang++
-EIGEN_INCLUDE = -I$(HOME)/eigen-3.4.0
+EIGEN_INCLUDE = -Ieigen-3.4.0
 LLVM_CXXFLAGS = $(shell llvm-config --cxxflags)
 LLVM_LDFLAGS = $(shell llvm-config --ldflags --system-libs --libs core support)
 CXXFLAGS = -std=c++17 -Wall -Wextra -pthread -g -O0 $(EIGEN_INCLUDE) -Iinclude $(LLVM_CXXFLAGS)
