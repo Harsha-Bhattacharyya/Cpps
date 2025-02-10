@@ -1,0 +1,31 @@
+# This file is a template, and might need editing before it works on your project.
+# This is a sample GitLab CI/CD configuration file that should run without any modifications.
+# It demonstratesimage: llvm/llvm:latest
+
+stages:
+  - run  # Changed to 'run' stage
+  - security
+
+variables:
+  CPPS_EXECUTABLE: cpps
+  SCRIPT_TO_RUN: install.pl # Name of your script
+
+before_script:
+  - apt-get update && apt-get install -y --no-install-recommends figlet unzip perl make libwww-perl # Dependencies (if needed)
+  # Eigen Installation (if needed) - See previous examples
+
+run:  # Changed stage name
+  stage: run
+  script:
+      
+    - perl $SCRIPT_TO_RUN  # Run the script
+
+security:
+  stage: security
+  image: registry.gitlab.com/snyk/snyk:latest
+  allow_failure: true
+  script:
+    - snyk code test --path=. --severity-threshold=low
+    # Or:
+    # - snyk container test --docker. --severity-threshold=low (if applicable)
+
