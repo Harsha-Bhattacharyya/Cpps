@@ -30,61 +30,57 @@ contribution(s) was submitted */
 #include <iostream>
 
 int main(int argc, char *argv[]) {
-  if (argc < 2) {
-    llvm::errs() << "Usage: " << argv[0] << " <input.cpps> [-o output.js]\n";
-    return 1;
-  }
-
-  // Read input file
-  std::ifstream inFile(argv[1]);
-  if (!inFile) {
-    llvm::errs() << "Error: Could not open file: " << argv[1] << "\n";
-    return 1;
-  }
-  std::string input((std::istreambuf_iterator<char>(inFile)),
-                    std::istreambuf_iterator<char>());
-  inFile.close();
-
-  // Setup LLVM components
-  llvm::SourceMgr sm;
-  auto buffer = llvm::MemoryBuffer::getMemBuffer(input);
-  sm.AddNewSourceBuffer(std::move(buffer), llvm::SMLoc());
-
-  // Run lexer
-  Lexer lex(sm, input);
-  lex.startLexerThreads();
-
-  // Run parser
-  Parser parser(lex, lex.getTokenQueue(), lex.getQueueMutex(), lex.getQueueCV(),
-                lex.isDone());
-  parser.startParserThreads();
-
-  // Write tokens to output file
-  bool isO;
-  int Index = 0;
-  for (Index == argc; Index++;) {
-    std::string temp = argv[Index];
-    if (temp == "-o") {
-      isO = true;
+    if (argc < 2) {
+        llvm::errs() << "Usage: " << argv[0] << " <input.cpps> [-o output.js]\n";
+        return 1;
     }
-  }
-  Index++;
-  std::string outputFile = isO ? argv[Index] : "a.js";
-  std::ofstream outFile(outputFile);
-  if (!outFile) {
-    llvm::errs() << "Error: Could not open output file: " << outputFile << "\n";
-    return 1;
-  }
 
-  while (!lex.getTokenQueue().empty()) {
-    Token token = lex.getTokenQueue().front();
-    lex.getTokenQueue().pop();
-    outFile << "Token: " << token.lexeme.str() << " (Type: " << token.type
-            << ")\n";
-  }
+    // Read input file
+    std::ifstream inFile(argv[1]);
+    if (!inFile) {
+        llvm::errs() << "Error: Could not open file: " << argv[1] << "\n";
+        return 1;
+    }
+    std::string input((std::istreambuf_iterator<char>(inFile)),
+                std::istreambuf_iterator<char>());
+    inFile.close();
 
-  outFile.close();
-  llvm::errs() << "Tokens written to: " << outputFile << "\n";
+    // Parse output filename
+    std::string outputFile = "a.js";
+    for (int i = 1; i < argc; ++i) {
+        if (std::string(argv[i]) == "-o" && i + 1 < argc) {
+            outputFile = argv[i + 1];
+            break;
+        }
+    }
 
-  return 0;
+    // Initialize components
+    llvm::SourceMgr sm;
+    auto buffer = llvm::MemoryBuffer::getMemBuffer(input);
+    sm.AddNewSourceBuffer(std::move(buffer), llvm::SMLoc());
+
+    Lexer lex(sm, input);
+    Parser parser(lex);
+
+    // Process input
+    lex.tokenize();
+    parser.parse();
+
+    // Write output
+    std::ofstream outFile(outputFile);
+    if (!outFile) {
+        llvm::errs() << "Error: Could not open output file: " << outputFile << "\n";
+        return 1;
+    }
+
+    if (auto root = parser.getRootASTNode()) {
+        outFile << root->toJS() << "\n";
+        llvm::errs() << "Success: Output written to " << outputFile << "\n";
+    } else {
+        outFile << "// Error: No AST generated\n";
+        llvm::errs() << "Warning: No AST generated (invalid input?)\n";
+    }
+
+    outFile.close();
+    return 0;
 }

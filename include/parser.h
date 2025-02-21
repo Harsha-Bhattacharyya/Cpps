@@ -20,135 +20,153 @@ software, where such license applies only to those patent claims licensable by
 such copyright holder that are necessarily infringed by their contribution(s)
 alone or by combination of their contribution(s) with the software to which such
 contribution(s) was submitted */
-
 #ifndef PARSER_H
 #define PARSER_H
 
 #include "lexer.h"
-#include <Eigen/Core> // For scalar operations
-#include <atomic>
-#include <condition_variable>
 #include <memory>
-#include <mutex>
 #include <queue>
-#include <string>
-#include <thread>
 #include <vector>
 
-// Abstract Syntax Tree (AST) Node Base Class
 struct ASTNode {
-  virtual ~ASTNode() = default;
-  virtual std::string toJS() const = 0; // Generate JavaScript code
-  virtual double evaluate() const = 0;  // Evaluate scalar value
+    virtual ~ASTNode() = default;
+    virtual std::string toJS() const = 0;
+    virtual double evaluate() const = 0;
 };
 
-// Variable Declaration Node (e.g., "int x = 5;")
+// Variable Declaration: "int x = 5;"
 struct VarDecl : ASTNode {
-  std::string name;
-  std::string type;
-  std::unique_ptr<ASTNode> initExpr;
+    std::string name;
+    std::string type;
+    std::unique_ptr<ASTNode> initExpr;
 
-  VarDecl(std::string name, std::string type, std::unique_ptr<ASTNode> initExpr)
-      : name(std::move(name)), type(std::move(type)),
-        initExpr(std::move(initExpr)) {}
+    VarDecl(std::string name, std::string type, std::unique_ptr<ASTNode> initExpr)
+        : name(std::move(name)), type(std::move(type)), initExpr(std::move(initExpr)) {}
 
-  std::string toJS() const override;
-  double evaluate() const override;
+    std::string toJS() const override {
+        return "let " + name + " = " + (initExpr ? initExpr->toJS() : "0") + ";";
+    }
+
+    double evaluate() const override {
+        return (initExpr) ? initExpr->evaluate() : 0.0;
+    }
 };
 
-// Binary Operation Node (e.g., "x + y", "a * b")
-struct BinaryOp : ASTNode {
-  std::unique_ptr<ASTNode> lhs;
-  std::unique_ptr<ASTNode> rhs;
-  std::string op; // "+", "-", "*", etc.
+// Block: "{ ... }"
+struct Block : ASTNode {
+    std::vector<std::unique_ptr<ASTNode>> statements;
 
-  BinaryOp(std::unique_ptr<ASTNode> lhs, std::unique_ptr<ASTNode> rhs,
-           std::string op)
-      : lhs(std::move(lhs)), rhs(std::move(rhs)), op(std::move(op)) {}
+    std::string toJS() const override {
+        std::string js = "{\n";
+        for (const auto &stmt : statements) {
+            js += stmt->toJS() + "\n";
+        }
+        js += "}";
+        return js;
+    }
 
-  std::string toJS() const override;
-  double evaluate() const override;
+    double evaluate() const override {
+        for (const auto &stmt : statements) {
+            stmt->evaluate();
+        }
+        return 0.0;
+    }
 };
 
-// If Statement Node (e.g., "if (x > 0) { ... } else { ... }")
+// If Statement: "if (cond) { ... } else { ... }"
 struct IfStmt : ASTNode {
-  std::unique_ptr<ASTNode> condition;
-  std::unique_ptr<ASTNode> thenBlock;
-  std::unique_ptr<ASTNode> elseBlock;
+    std::unique_ptr<ASTNode> condition;
+    std::unique_ptr<ASTNode> thenBlock;
+    std::unique_ptr<ASTNode> elseBlock;
 
-  IfStmt(std::unique_ptr<ASTNode> condition, std::unique_ptr<ASTNode> thenBlock,
-         std::unique_ptr<ASTNode> elseBlock = nullptr)
-      : condition(std::move(condition)), thenBlock(std::move(thenBlock)),
-        elseBlock(std::move(elseBlock)) {}
+    std::string toJS() const override {
+        std::string js = "if (" + condition->toJS() + ") " + thenBlock->toJS();
+        if (elseBlock) {
+            js += " else " + elseBlock->toJS();
+        }
+        return js;
+    }
 
-  std::string toJS() const override;
-  double evaluate() const override;
+    double evaluate() const override {
+        if (condition->evaluate() != 0) {
+            return thenBlock->evaluate();
+        } else if (elseBlock) {
+            return elseBlock->evaluate();
+        }
+        return 0.0;
+    }
 };
 
-// For Loop Node (e.g., "for (int i=0; i<10; i++) { ... }")
+// For Loop: "for (init; cond; inc) { ... }"
 struct ForLoop : ASTNode {
-  std::unique_ptr<ASTNode> init;
-  std::unique_ptr<ASTNode> condition;
-  std::unique_ptr<ASTNode> increment;
-  std::unique_ptr<ASTNode> body;
+    std::unique_ptr<ASTNode> init;
+    std::unique_ptr<ASTNode> condition;
+    std::unique_ptr<ASTNode> increment;
+    std::unique_ptr<ASTNode> body;
 
-  ForLoop(std::unique_ptr<ASTNode> init, std::unique_ptr<ASTNode> condition,
-          std::unique_ptr<ASTNode> increment, std::unique_ptr<ASTNode> body)
-      : init(std::move(init)), condition(std::move(condition)),
-        increment(std::move(increment)), body(std::move(body)) {}
+    std::string toJS() const override {
+        return "for (" + init->toJS() + "; " + condition->toJS() + "; " +
+               increment->toJS() + ") " + body->toJS();
+    }
 
-  std::string toJS() const override;
-  double evaluate() const override;
+    double evaluate() const override {
+        for (init->evaluate(); condition->evaluate() != 0; increment->evaluate()) {
+            body->evaluate();
+        }
+        return 0.0;
+    }
 };
 
-// While Loop Node (e.g., "while (x > 0) { ... }")
+// While Loop: "while (cond) { ... }"
 struct WhileLoop : ASTNode {
-  std::unique_ptr<ASTNode> condition;
-  std::unique_ptr<ASTNode> body;
+    std::unique_ptr<ASTNode> condition;
+    std::unique_ptr<ASTNode> body;
 
-  WhileLoop(std::unique_ptr<ASTNode> condition, std::unique_ptr<ASTNode> body)
-      : condition(std::move(condition)), body(std::move(body)) {}
+    std::string toJS() const override {
+        return "while (" + condition->toJS() + ") " + body->toJS();
+    }
 
-  std::string toJS() const override;
-  double evaluate() const override;
+    double evaluate() const override {
+        while (condition->evaluate() != 0) {
+            body->evaluate();
+        }
+        return 0.0;
+    }
 };
 
-// Expression Node (e.g., "42", "x", "x + y")
+// Expression: "x + y"
 struct Expr : ASTNode {
-  std::string value;
+    std::string value;
 
-  Expr(std::string value) : value(std::move(value)) {}
+    Expr(std::string value) : value(std::move(value)) {}
 
-  std::string toJS() const override;
-  double evaluate() const override;
+    std::string toJS() const override { return value; }
+
+    double evaluate() const override {
+        // Simplified evaluation for numbers
+        return stod(value);
+    }
 };
 
-// Parser Class
 class Parser {
-  Lexer &Lex;
-  std::queue<Token> &TokenQueue;
-  std::mutex &QueueMutex;
-  std::condition_variable &QueueCV;
-  std::atomic<bool> &Done;
+    Lexer &Lex;
+    std::queue<Token> &TokenQueue;
 
-  // Helper functions
-  Token peek();
-  Token advance();
-  bool match(TokenType type);
-  void error(const std::string &msg);
+    std::unique_ptr<ASTNode> parseExpression();
+    std::unique_ptr<ASTNode> parseStatement();
+    std::unique_ptr<ASTNode> parseBlock();
+    std::unique_ptr<ASTNode> parseIfStmt();
+    std::unique_ptr<ASTNode> parseForLoop();
+    std::unique_ptr<ASTNode> parseWhileLoop();
 
 public:
-  // Constructor
-  Parser(Lexer &Lex, std::queue<Token> &TokenQueue, std::mutex &QueueMutex,
-         std::condition_variable &QueueCV, std::atomic<bool> &Done)
-      : Lex(Lex), TokenQueue(TokenQueue), QueueMutex(QueueMutex),
-        QueueCV(QueueCV), Done(Done) {}
+    Parser(Lexer &Lex) : Lex(Lex), TokenQueue(Lex.getTokenQueue()) {}
 
-  // Parse tokens into AST nodes
-  void parseChunk();
+    void parse();
+    std::unique_ptr<ASTNode> getRootASTNode() { return std::move(RootAST); }
 
-  // Start parser threads
-  void startParserThreads();
+private:
+    std::unique_ptr<ASTNode> RootAST;
 };
 
-#endif // PARSER_H
+#endif
