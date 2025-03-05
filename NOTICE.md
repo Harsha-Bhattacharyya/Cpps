@@ -1,5 +1,3 @@
-NOTICE
-
 | Component       | Author                | License                        |
 |-----------------|-----------------------|--------------------------------|
 | Project Code    | Harsha Bhattacharyya  | BSD-2-Clause Plus Patent      |
