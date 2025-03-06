@@ -32,7 +32,7 @@ std::unique_ptr<ASTNode> Parser::parseExpression() {
     if (token.type == INTEGER_LITERAL || token.type == FLOAT_LITERAL || token.type == IDENTIFIER) {
         return std::make_unique<Expr>(token.lexeme.str());
     }
-    return nullptr;
+    return;
 }
 
 std::unique_ptr<ASTNode> Parser::parseBlock() {
