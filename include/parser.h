@@ -27,7 +27,8 @@ contribution(s) was submitted */
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
-#include "llvm/Analysis/CompilerInlineStrategy.h"
+#include "llvm/IR/InlineAsm.h"
+#include "llvm/Transforms/IPO/Inliner.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
@@ -39,7 +40,8 @@ contribution(s) was submitted */
 #include "llvm/IR/Verifier.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/raw_ostream.h"
-
+#include <queue>
+#include "lexer.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -463,7 +465,7 @@ class NamespaceAST : public ASTNode {
     llvm::SMLoc sourceLocation;
 
 public:
-    NspaceAST(llvm::SMLoc loc, 
+    NamespaceAST(llvm::SMLoc loc, 
          std::string name, 
          std::vector<std::unique_ptr<ASTNode>> members)
     : name(std::move(name)), 
@@ -735,5 +737,24 @@ public:
         return nullptr;
     }
 };
+// Parser class definition
+class Parser {
+private:
+    std::queue<Token> &TokenQueue;
+    std::unique_ptr<ASTNode> RootAST;
 
-#endif // COMPREHENSIVE_AST_Hame
+public:
+    Parser(Lexer &lexer) : TokenQueue(lexer.getTokenQueue()), RootAST(nullptr) {}
+
+    std::unique_ptr<ASTNode> parseExpression();
+    std::unique_ptr<ASTNode> parseBlock();
+    std::unique_ptr<ASTNode> parseIfStmt();
+    std::unique_ptr<ASTNode> parseForLoop();
+    std::unique_ptr<ASTNode> parseWhileLoop();
+    std::unique_ptr<ASTNode> parseStatement();
+    void parse();
+
+    std::unique_ptr<ASTNode> getRootASTNode() { return std::move(RootAST); }
+};
+
+#endif // COMPREHENSIVE_AST_H
