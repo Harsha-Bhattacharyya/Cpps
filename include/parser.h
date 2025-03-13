@@ -493,268 +493,266 @@ public:
 
     llvm::Value* codegen(CodeGenContext& context) override {
         // Create a module-level namespace using LLVM
-        llvm::Module* module = context.getModule();
-        
-        // Create a global variable representing the namespace
-        llvm::Type* namespaceType = llvm::StructType::create(context.getLLVMContext(), name + "_type");
-        
-        // Generate code for each member
-        for (const auto& member : members) {
-            member->codegen(context);
-        }
-        
-        return nullptr;
-    }
-};
+          
+          // Create a global variable representing the namespace
+          
+          // Generate code for each member
+          for (const auto& member : members) {
+              member->codegen(context);
+          }
+          
+          return nullptr;
+      }
+  };
 
-// Function Call Expression
-class FunctionCallAST : public ExprAST {
-    std::string functionName;
-    std::vector<std::unique_ptr<ExprAST>> arguments;
+  // Function Call Expression
+  class FunctionCallAST : public ExprAST {
+      std::string functionName;
+      std::vector<std::unique_ptr<ExprAST>> arguments;
 
-public:
-    FunctionCallAST(llvm::SMLoc loc, 
-                    std::string funcName, 
-                    std::vector<std::unique_ptr<ExprAST>> args)
-        : ExprAST(ExprAST::FUNCTION_CALL, loc),
-          functionName(std::move(funcName)),
-          arguments(std::move(args)) {}
+  public:
+      FunctionCallAST(llvm::SMLoc loc, 
+                      std::string funcName, 
+                      std::vector<std::unique_ptr<ExprAST>> args)
+          : ExprAST(ExprAST::FUNCTION_CALL, loc),
+            functionName(std::move(funcName)),
+            arguments(std::move(args)) {}
 
-    std::string toJS() const override {
-        std::vector<std::string> argStrings;
-        for (const auto& arg : arguments) {
-            argStrings.push_back(arg->toJS());
-        }
-        
-        std::string argStr = "(" + 
-            (argStrings.empty() ? "" : 
-             join(argStrings.begin(), argStrings.end(), ", ")) + 
-            ")";
-        
-        return functionName + argStr;
-    }
+      std::string toJS() const override {
+          std::vector<std::string> argStrings;
+          for (const auto& arg : arguments) {
+              argStrings.push_back(arg->toJS());
+          }
+          
+          std::string argStr = "(" + 
+              (argStrings.empty() ? "" : 
+              join(argStrings.begin(), argStrings.end(), ", ")) + 
+              ")";
+          
+          return functionName + argStr;
+      }
 
-    std::string getType() const override {
-        // In a real implementation, this would look up the function's return type
-        return "any";
-    }
+      std::string getType() const override {
+          // In a real implementation, this would look up the function's return type
+          return "any";
+      }
 
-    bool typeCheck() const override {
-        // Check argument types match function signature
-        return std::all_of(arguments.begin(), arguments.end(), 
-            [](const auto& arg) { return arg->typeCheck(); });
-    }
+      bool typeCheck() const override {
+          // Check argument types match function signature
+          return std::all_of(arguments.begin(), arguments.end(), 
+              [](const auto& arg) { return arg->typeCheck(); });
+      }
 
-    llvm::Value* codegen(CodeGenContext& context) override;
+      llvm::Value* codegen(CodeGenContext& context) override;
 
-private:
-    // Helper function to join vector elements
-    template<typename Iterator>
-    std::string join(Iterator begin, Iterator end, const std::string& separator) const {
-        std::string result;
-        if (begin != end) {
-            result = *begin;
-            ++begin;
-            while (begin != end) {
-                result += separator + *begin;
-                ++begin;
-            }
-        }
-        return result;
-    }
-};
+  private:
+      // Helper function to join vector elements
+      template<typename Iterator>
+      std::string join(Iterator begin, Iterator end, const std::string& separator) const {
+          std::string result;
+          if (begin != end) {
+              result = *begin;
+              ++begin;
+              while (begin != end) {
+                  result += separator + *begin;
+                  ++begin;
+              }
+          }
+          return result;
+      }
+  };
 
-// Return Statement
-class ReturnStatementAST : public ASTNode {
-    std::unique_ptr<ExprAST> returnValue;
-    llvm::SMLoc sourceLocation;
+  // Return Statement
+  class ReturnStatementAST : public ASTNode {
+      std::unique_ptr<ExprAST> returnValue;
+      llvm::SMLoc sourceLocation;
 
-public:
-    ReturnStatementAST(llvm::SMLoc loc, 
-                       std::unique_ptr<ExprAST> value = nullptr)
-        : returnValue(std::move(value)), 
-          sourceLocation(loc) {}
+  public:
+      ReturnStatementAST(llvm::SMLoc loc, 
+                        std::unique_ptr<ExprAST> value = nullptr)
+          : returnValue(std::move(value)), 
+            sourceLocation(loc) {}
 
-    std::string toJS() const override {
-        return returnValue ? 
-            "return " + returnValue->toJS() + ";" : 
-            "return;";
-    }
+      std::string toJS() const override {
+          return returnValue ? 
+              "return " + returnValue->toJS() + ";" : 
+              "return;";
+      }
 
-    bool typeCheck() const override {
-        return !returnValue || returnValue->typeCheck();
-    }
+      bool typeCheck() const override {
+          return !returnValue || returnValue->typeCheck();
+      }
 
-    llvm::SMLoc getLocation() const override { return sourceLocation; }
+      llvm::SMLoc getLocation() const override { return sourceLocation; }
 
-    llvm::Value* codegen(CodeGenContext& context) override;
-};
+      llvm::Value* codegen(CodeGenContext& context) override;
+  };
 
-// While Loop
-class WhileLoopAST : public ASTNode {
-    std::unique_ptr<ExprAST> condition;
-    std::unique_ptr<ASTNode> body;
-    llvm::SMLoc sourceLocation;
+  // While Loop
+  class WhileLoopAST : public ASTNode {
+      std::unique_ptr<ExprAST> condition;
+      std::unique_ptr<ASTNode> body;
+      llvm::SMLoc sourceLocation;
 
-public:
-    WhileLoopAST(llvm::SMLoc loc, 
-                 std::unique_ptr<ExprAST> cond, 
-                 std::unique_ptr<ASTNode> loopBody)
-        : condition(std::move(cond)), 
-          body(std::move(loopBody)),
-          sourceLocation(loc) {}
+  public:
+      WhileLoopAST(llvm::SMLoc loc, 
+                  std::unique_ptr<ExprAST> cond, 
+                  std::unique_ptr<ASTNode> loopBody)
+          : condition(std::move(cond)), 
+            body(std::move(loopBody)),
+            sourceLocation(loc) {}
 
-    std::string toJS() const override {
-        return "while (" + condition->toJS() + ") " + body->toJS();
-    }
+      std::string toJS() const override {
+          return "while (" + condition->toJS() + ") " + body->toJS();
+      }
 
-    bool typeCheck() const override {
-        return condition->getType() == "bool" && 
-               condition->typeCheck() && 
-               body->typeCheck();
-    }
+      bool typeCheck() const override {
+          return condition->getType() == "bool" && 
+                condition->typeCheck() && 
+                body->typeCheck();
+      }
 
-    llvm::SMLoc getLocation() const override { return sourceLocation; }
+      llvm::SMLoc getLocation() const override { return sourceLocation; }
 
-    llvm::Value* codegen(CodeGenContext& context) override;
-};
+      llvm::Value* codegen(CodeGenContext& context) override;
+  };
 
-// Do-While Loop
-class DoWhileLoopAST : public ASTNode {
-    std::unique_ptr<ASTNode> body;
-    std::unique_ptr<ExprAST> condition;
-    llvm::SMLoc sourceLocation;
+  // Do-While Loop
+  class DoWhileLoopAST : public ASTNode {
+      std::unique_ptr<ASTNode> body;
+      std::unique_ptr<ExprAST> condition;
+      llvm::SMLoc sourceLocation;
 
-public:
-    DoWhileLoopAST(llvm::SMLoc loc, 
-                   std::unique_ptr<ASTNode> loopBody, 
-                   std::unique_ptr<ExprAST> cond)
-        : body(std::move(loopBody)), 
-          condition(std::move(cond)),
-          sourceLocation(loc) {}
+  public:
+      DoWhileLoopAST(llvm::SMLoc loc, 
+                    std::unique_ptr<ASTNode> loopBody, 
+                    std::unique_ptr<ExprAST> cond)
+          : body(std::move(loopBody)), 
+            condition(std::move(cond)),
+            sourceLocation(loc) {}
 
-    std::string toJS() const override {
-        return "do " + body->toJS() + " while (" + condition->toJS() + ");";
-    }
+      std::string toJS() const override {
+          return "do " + body->toJS() + " while (" + condition->toJS() + ");";
+      }
 
-    bool typeCheck() const override {
-        return condition->getType() == "bool" && 
-               condition->typeCheck() && 
-               body->typeCheck();
-    }
+      bool typeCheck() const override {
+          return condition->getType() == "bool" && 
+                condition->typeCheck() && 
+                body->typeCheck();
+      }
 
-    llvm::SMLoc getLocation() const override { return sourceLocation; }
+      llvm::SMLoc getLocation() const override { return sourceLocation; }
 
-    llvm::Value* codegen(CodeGenContext& context) override;
-};
+      llvm::Value* codegen(CodeGenContext& context) override;
+  };
 
-// Error Handling AST Node
-class ErrorAST : public ASTNode {
-    std::string errorMessage;
-    llvm::SMLoc sourceLocation;
+  // Error Handling AST Node
+  class ErrorAST : public ASTNode {
+      std::string errorMessage;
+      llvm::SMLoc sourceLocation;
 
-public:
-    ErrorAST(llvm::SMLoc loc, std::string message)
-        : errorMessage(std::move(message)), 
-          sourceLocation(loc) {}
+  public:
+      ErrorAST(llvm::SMLoc loc, std::string message)
+          : errorMessage(std::move(message)), 
+            sourceLocation(loc) {}
 
-    std::string toJS() const override {
-        return "// ERROR: " + errorMessage;
-    }
+      std::string toJS() const override {
+          return "// ERROR: " + errorMessage;
+      }
 
-    bool typeCheck() const override { return false; }
+      bool typeCheck() const override { return false; }
 
-    llvm::SMLoc getLocation() const override { return sourceLocation; }
+      llvm::SMLoc getLocation() const override { return sourceLocation; }
 
-    llvm::Value* codegen(CodeGenContext& context) override {
-        // Log error to LLVM error stream
-        llvm::errs() << "Compilation Error at " 
-                     << sourceLocation.getPointer() 
-                     << ": " << errorMessage << "\n";
-        return nullptr;
-    }
-};
+      llvm::Value* codegen(CodeGenContext& context) override {
+          // Log error to LLVM error stream
+          llvm::errs() << "Compilation Error at " 
+                      << sourceLocation.getPointer() 
+                      << ": " << errorMessage << "\n";
+          return nullptr;
+      }
+  };
 
-// Type Alias Declaration
-class TypeAliasAST : public ASTNode {
-    std::string alias;
-    std::string originalType;
-    llvm::SMLoc sourceLocation;
+  // Type Alias Declaration
+  class TypeAliasAST : public ASTNode {
+      std::string alias;
+      std::string originalType;
+      llvm::SMLoc sourceLocation;
 
-public:
-    TypeAliasAST(llvm::SMLoc loc, 
-                 std::string aliasName, 
-                 std::string baseType)
-        : alias(std::move(aliasName)), 
-          originalType(std::move(baseType)),
-          sourceLocation(loc) {}
+  public:
+      TypeAliasAST(llvm::SMLoc loc, 
+                  std::string aliasName, 
+                  std::string baseType)
+          : alias(std::move(aliasName)), 
+            originalType(std::move(baseType)),
+            sourceLocation(loc) {}
 
-    std::string toJS() const override {
-        // In JavaScript, type aliases are typically comments
-        return "// type " + alias + " = " + originalType + ";";
-    }
+      std::string toJS() const override {
+          // In JavaScript, type aliases are typically comments
+          return "// type " + alias + " = " + originalType + ";";
+      }
 
-    bool typeCheck() const override { return true; }
+      bool typeCheck() const override { return true; }
 
-    llvm::SMLoc getLocation() const override { return sourceLocation; }
+      llvm::SMLoc getLocation() const override { return sourceLocation; }
 
-    llvm::Value* codegen(CodeGenContext& context) override {
-        // Type aliases are mostly compile-time constructs
-        // In LLVM, this might involve type metadata
-        return nullptr;
-    }
-};
+      llvm::Value* codegen(CodeGenContext& context) override {
+          // Type aliases are mostly compile-time constructs
+          // In LLVM, this might involve type metadata
+          return nullptr;
+      }
+  };
 
-// Enum Declaration
-class EnumDeclarationAST : public ASTNode {
-    std::string name;
-    std::vector<std::pair<std::string, int>> members;
-    llvm::SMLoc sourceLocation;
+  // Enum Declaration
+  class EnumDeclarationAST : public ASTNode {
+      std::string name;
+      std::vector<std::pair<std::string, int>> members;
+      llvm::SMLoc sourceLocation;
 
-public:
-    EnumDeclarationAST(llvm::SMLoc loc, 
-                       std::string enumName, 
-                       std::vector<std::pair<std::string, int>> enumMembers)
-        : name(std::move(enumName)), 
-          members(std::move(enumMembers)),
-          sourceLocation(loc) {}
+  public:
+      EnumDeclarationAST(llvm::SMLoc loc, 
+                        std::string enumName, 
+                        std::vector<std::pair<std::string, int>> enumMembers)
+          : name(std::move(enumName)), 
+            members(std::move(enumMembers)),
+            sourceLocation(loc) {}
 
-    std::string toJS() const override {
-        std::string js = "const " + name + " = {\n";
-        for (const auto& [memberName, value] : members) {
-            js += "  " + memberName + ": " + std::to_string(value) + ",\n";
-        }
-        js += "};\n";
-        return js;
-    }
+      std::string toJS() const override {
+          std::string js = "const " + name + " = {\n";
+          for (const auto& [memberName, value] : members) {
+              js += "  " + memberName + ": " + std::to_string(value) + ",\n";
+          }
+          js += "};\n";
+          return js;
+      }
 
-    bool typeCheck() const override { return true; }
+      bool typeCheck() const override { return true; }
 
-    llvm::SMLoc getLocation() const override { return sourceLocation; }
+      llvm::SMLoc getLocation() const override { return sourceLocation; }
 
-    llvm::Value* codegen(CodeGenContext& context) override {
-        // Create an enum representation in LLVM
-        return nullptr;
-    }
-};
-// Parser class definition
-class Parser {
-private:
-    std::queue<Token> &TokenQueue;
-    std::unique_ptr<ASTNode> RootAST;
+      llvm::Value* codegen(CodeGenContext& context) override {
+          // Create an enum representation in LLVM
+          return nullptr;
+      }
+  };
+  // Parser class definition
+  class Parser {
+  private:
+      std::queue<Token> &TokenQueue;
+      std::unique_ptr<ASTNode> RootAST;
 
-public:
-    Parser(Lexer &lexer) : TokenQueue(lexer.getTokenQueue()), RootAST(nullptr) {}
+  public:
+      Parser(Lexer &lexer) : TokenQueue(lexer.getTokenQueue()), RootAST(nullptr) {}
 
-    std::unique_ptr<ASTNode> parseExpression();
-    std::unique_ptr<ASTNode> parseBlock();
-    std::unique_ptr<ASTNode> parseIfStmt();
-    std::unique_ptr<ASTNode> parseForLoop();
-    std::unique_ptr<ASTNode> parseWhileLoop();
-    std::unique_ptr<ASTNode> parseStatement();
-    void parse();
+      std::unique_ptr<ASTNode> parseExpression();
+      std::unique_ptr<ASTNode> parseBlock();
+      std::unique_ptr<ASTNode> parseIfStmt();
+      std::unique_ptr<ASTNode> parseForLoop();
+      std::unique_ptr<ASTNode> parseWhileLoop();
+      std::unique_ptr<ASTNode> parseStatement();
+      void parse();
 
-    std::unique_ptr<ASTNode> getRootASTNode() { return std::move(RootAST); }
-};
+      std::unique_ptr<ASTNode> getRootASTNode() { return std::move(RootAST); }
+  };
 
 #endif // COMPREHENSIVE_AST_H
