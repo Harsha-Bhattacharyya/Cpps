@@ -664,8 +664,8 @@ public:
 
       llvm::SMLoc getLocation() const override { return sourceLocation; }
 
-      llvm::Value* codegen(CodeGenContext& context) override {
           // Log error to LLVM error stream
+  llvm::Value* codegen([[maybe_unused]] CodeGenContext& context) override {
           llvm::errs() << "Compilation Error at " 
                       << sourceLocation.getPointer() 
                       << ": " << errorMessage << "\n";

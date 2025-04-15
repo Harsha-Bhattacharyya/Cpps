@@ -20,7 +20,8 @@ software, where such license applies only to those patent claims licensable by
 such copyright holder that are necessarily infringed by their contribution(s)
 alone or by combination of their contribution(s) with the software to which such
 contribution(s) was submitted */
-
+#include <memory>
+#include <vector>
 #include "parser.h"
 #include "llvm/Support/raw_ostream.h"
 
@@ -30,16 +31,19 @@ std::unique_ptr<ASTNode> Parser::parseExpression() {
     TokenQueue.pop();
 
     if (token.type == INTEGER_LITERAL || token.type == FLOAT_LITERAL || token.type == IDENTIFIER) {
-        return std::make_unique<LiteralAST>(token.lexeme.str(), 
-            token.type == INTEGER_LITERAL ? LiteralAST::INTEGER : 
-            (token.type == FLOAT_LITERAL ? LiteralAST::FLOAT : LiteralAST::STRING), 
-            llvm::SMLoc());
-    }
-    return nullptr;
+ return std::make_unique<LiteralAST>(
+    llvm::SMLoc(),  // location first
+    token.lexeme.str(),  // then value
+    token.type == INTEGER_LITERAL ? LiteralAST::INTEGER : 
+        (token.type == FLOAT_LITERAL ? LiteralAST::FLOAT : LiteralAST::STRING)  // then type
+);   return nullptr;
 }
 
 std::unique_ptr<ASTNode> Parser::parseBlock() {
-    auto block = std::make_unique<BlockAST>(llvm::SMLoc());
+  auto block = std::make_unique<BlockAST>(
+    llvm::SMLoc(),
+    std::vector<std::unique_ptr<ASTNode>>()  // Initialize with empty vector
+);
     TokenQueue.pop(); // Skip '{'
     while (!TokenQueue.empty() && TokenQueue.front().type != RBRACE) {
         block->addStatement(parseStatement());
@@ -60,9 +64,12 @@ std::unique_ptr<ASTNode> Parser::parseIfStmt() {
         TokenQueue.pop(); // Skip 'else'
         elseBlock = parseBlock();
     }
-
-    return std::make_unique<IfStatementAST>(llvm::SMLoc(), 
-        std::move(condition), std::move(thenBlock), std::move(elseBlock));
+return std::make_unique<IfStatementAST>(
+    llvm::SMLoc(),
+    std::dynamic_pointer_cast<ExprAST>(std::move(condition)),  // Cast to ExprAST
+    std::move(thenBlock),
+    std::move(elseBlock)
+);
 }
 
 std::unique_ptr<ASTNode> Parser::parseForLoop() {
@@ -74,8 +81,13 @@ std::unique_ptr<ASTNode> Parser::parseForLoop() {
     auto increment = parseExpression();
     TokenQueue.pop(); // Skip ')'
     auto body = parseBlock();
-    return std::make_unique<ForLoopAST>(llvm::SMLoc(), 
-        std::move(init), std::move(condition), std::move(increment), std::move(body));
+return std::make_unique<ForLoopAST>(
+    llvm::SMLoc(),
+    std::move(init),
+    std::dynamic_pointer_cast<ExprAST>(std::move(condition)),  // Cast to ExprAST
+    std::dynamic_pointer_cast<ExprAST>(std::move(increment)),
+    std::move(body)
+);
 }
 
 std::unique_ptr<ASTNode> Parser::parseWhileLoop() {
@@ -84,8 +96,11 @@ std::unique_ptr<ASTNode> Parser::parseWhileLoop() {
     auto condition = parseExpression();
     TokenQueue.pop(); // Skip ')'
     auto body = parseBlock();
-    return std::make_unique<WhileLoopAST>(llvm::SMLoc(), 
-        std::move(condition), std::move(body));
+  return std::make_unique<WhileLoopAST>(
+    llvm::SMLoc(),
+    std::dynamic_pointer_cast<ExprAST>(std::move(condition)),  // Cast to ExprAST
+    std::move(body)
+);
 }
 
 std::unique_ptr<ASTNode> Parser::parseStatement() {
@@ -113,7 +128,7 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
     }
     return parseExpression();
 }
-
+}
 void Parser::parse() {
     auto rootBlock = std::make_unique<BlockAST>(llvm::SMLoc());
     while (!TokenQueue.empty()) {

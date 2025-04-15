@@ -9,6 +9,9 @@
 
 <img src="logo.png" alt="LOGO" /> 
 
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg
+
+
 Cppscript is a powerful, high-performance language designed to provide a C++-like experience, while seamlessly compiling into optimized JavaScript code.
 
 
