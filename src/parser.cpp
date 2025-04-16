@@ -38,6 +38,7 @@ std::unique_ptr<ASTNode> Parser::parseExpression() {
         (token.type == FLOAT_LITERAL ? LiteralAST::FLOAT : LiteralAST::STRING)  // then type
 );   return nullptr;
 }
+}
 
 std::unique_ptr<ASTNode> Parser::parseBlock() {
   auto block = std::make_unique<BlockAST>(
@@ -128,10 +129,11 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
     }
     return parseExpression();
 }
-}
+
 void Parser::parse() {
-    auto rootBlock = std::make_unique<BlockAST>(llvm::SMLoc());
-    while (!TokenQueue.empty()) {
+// In parser.cpp where you're creating the BlockAST
+  auto rootBlock = std::make_unique<BlockAST>(llvm::SMLoc(), std::vector<std::unique_ptr<ASTNode>>());
+  while (!TokenQueue.empty()) {
         rootBlock->addStatement(parseStatement());
     }
     RootAST = std::move(rootBlock);
