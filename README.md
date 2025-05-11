@@ -11,7 +11,8 @@
 
 ![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)
 
-
+Sorry, The project is under a complete rework. It will be complete in a few months
+<!---
 Cppscript is a powerful, high-performance language designed to provide a C++-like experience, while seamlessly compiling into optimized JavaScript code.
 
 
@@ -30,7 +31,7 @@ Required: clang, make, llvm, perl.
 You just need to run the install script.
 
 #### Discord:https://discord.gg/zCB83CKBce
-
+-->
 #                THANKS!
 
 </div>
