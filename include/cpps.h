@@ -55,14 +55,14 @@ class TestRegistry {
 private:
     std::vector<TestCase> tests;
     std::vector<TestResult> results;
-    static TestRegistry* instance;
+    static std::unique_ptr<TestRegistry> instance;
 
     TestRegistry() = default;
 
 public:
     static TestRegistry& getInstance() {
         if (!instance) {
-            instance = new TestRegistry();
+            instance = std::unique_ptr<TestRegistry>(new TestRegistry());
         }
         return *instance;
     }

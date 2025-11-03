@@ -21,13 +21,13 @@ such copyright holder that are necessarily infringed by their contribution(s)
 alone or by combination of their contribution(s) with the software to which such
 contribution(s) was submitted */
 
-#include "../include/cpps.h"
+#include "cpps.h"
 #include <iostream>
 #include <iomanip>
 
 namespace cpps {
 
-TestRegistry* TestRegistry::instance = nullptr;
+std::unique_ptr<TestRegistry> TestRegistry::instance = nullptr;
 
 int TestRunner::runAllTests(bool verbose) {
     auto& registry = TestRegistry::getInstance();
