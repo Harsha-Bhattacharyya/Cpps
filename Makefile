@@ -16,11 +16,11 @@ CXXFLAGS = -std=c++17 -Wall -Wextra -pthread -g -O0 -Iinclude
 
 # Source and object files
 SRC_DIR = src
-SRCS = $(SRC_DIR)/cpps.cpp $(SRC_DIR)/main.cpp
+SRCS = $(SRC_DIR)/puppet.cpp $(SRC_DIR)/main.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 # Executable
-TARGET = cpps
+TARGET = puppet++
 
 # Example test files
 EXAMPLE_DIR = examples
@@ -35,7 +35,7 @@ $(TARGET): $(OBJS)
 
 example: $(EXAMPLE_TARGET)
 
-$(EXAMPLE_TARGET): $(EXAMPLE_OBJS) src/cpps.o
+$(EXAMPLE_TARGET): $(EXAMPLE_OBJS) src/puppet.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 %.o: %.cpp

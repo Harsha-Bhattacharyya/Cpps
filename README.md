@@ -5,7 +5,7 @@
 
 
 <div style="text-align: center;">
-<h1 style="text-align: center;">CPPS - C++ Unit Testing Framework</h1>
+<h1 style="text-align: center;">Puppet++ - C++ Unit Testing Framework</h1>
 
 <img src="logo.png" alt="LOGO" /> 
 
@@ -13,11 +13,11 @@
 
 ## Overview
 
-CPPS (C++ Testing System) is a lightweight, powerful C++ unit testing framework designed to complement GDB debugging. It provides an intuitive API for writing tests with minimal boilerplate while offering deep integration with debugging workflows.
+Puppet++ (C++ Testing System) is a lightweight, powerful C++ unit testing framework designed to complement GDB debugging. It provides an intuitive API for writing tests with minimal boilerplate while offering deep integration with debugging workflows.
 
 ## Features
 
-- **Simple Test Definition**: Use `CPPS_TEST` macro to define tests with automatic registration
+- **Simple Test Definition**: Use `PUPPET_TEST` macro to define tests with automatic registration
 - **Rich Assertions**: Comprehensive assertion macros including equality checks, boolean checks, and null pointer checks
 - **GDB Integration**: Special helpers for breakpoints, variable inspection, and checkpoints that work seamlessly with GDB
 - **Colored Output**: Clear, colored test results for easy identification of passes and failures
@@ -44,7 +44,7 @@ make example
 ### Writing Tests
 
 ```cpp
-#include "cpps.h"
+#include "puppet.h"
 
 // Function to test
 int add(int a, int b) {
@@ -52,41 +52,41 @@ int add(int a, int b) {
 }
 
 // Define a test
-CPPS_TEST(test_addition) {
-    CPPS_ASSERT_EQUAL(5, add(2, 3));
-    CPPS_ASSERT_EQUAL(0, add(-5, 5));
+PUPPET_TEST(test_addition) {
+    PUPPET_ASSERT_EQUAL(5, add(2, 3));
+    PUPPET_ASSERT_EQUAL(0, add(-5, 5));
 }
 
 // Run tests
 int main() {
-    return cpps::TestRunner::runAllTests(true);
+    return puppet::TestRunner::runAllTests(true);
 }
 ```
 
 ### Available Assertions
 
-- `CPPS_ASSERT(condition)` - Assert that condition is true
-- `CPPS_ASSERT_EQUAL(expected, actual)` - Assert equality
-- `CPPS_ASSERT_NOT_EQUAL(expected, actual)` - Assert inequality
-- `CPPS_ASSERT_TRUE(condition)` - Assert condition is true
-- `CPPS_ASSERT_FALSE(condition)` - Assert condition is false
-- `CPPS_ASSERT_NULL(ptr)` - Assert pointer is null
-- `CPPS_ASSERT_NOT_NULL(ptr)` - Assert pointer is not null
+- `PUPPET_ASSERT(condition)` - Assert that condition is true
+- `PUPPET_ASSERT_EQUAL(expected, actual)` - Assert equality
+- `PUPPET_ASSERT_NOT_EQUAL(expected, actual)` - Assert inequality
+- `PUPPET_ASSERT_TRUE(condition)` - Assert condition is true
+- `PUPPET_ASSERT_FALSE(condition)` - Assert condition is false
+- `PUPPET_ASSERT_NULL(ptr)` - Assert pointer is null
+- `PUPPET_ASSERT_NOT_NULL(ptr)` - Assert pointer is not null
 
 ### GDB Integration
 
-CPPS provides special helpers for debugging with GDB:
+Puppet++ provides special helpers for debugging with GDB:
 
 ```cpp
-CPPS_TEST(debug_example) {
-    cpps::gdb::checkpoint("Starting computation");
+PUPPET_TEST(debug_example) {
+    puppet::gdb::checkpoint("Starting computation");
     
     int x = 42;
-    cpps::gdb::inspect("x", x);
+    puppet::gdb::inspect("x", x);
     
-    cpps::gdb::breakpoint("CUSTOM_MARKER");
+    puppet::gdb::breakpoint("CUSTOM_MARKER");
     
-    CPPS_ASSERT_EQUAL(42, x);
+    PUPPET_ASSERT_EQUAL(42, x);
 }
 ```
 
@@ -100,9 +100,9 @@ gdb ./test_example
 
 ## Usage
 
-Compile your tests with CPPS:
+Compile your tests with Puppet++:
 ```bash
-g++ -std=c++17 -Iinclude -o my_tests my_tests.cpp src/cpps.cpp
+g++ -std=c++17 -Iinclude -o my_tests my_tests.cpp src/puppet.cpp
 ./my_tests
 ```
 

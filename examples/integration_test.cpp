@@ -21,7 +21,7 @@ such copyright holder that are necessarily infringed by their contribution(s)
 alone or by combination of their contribution(s) with the software to which such
 contribution(s) was submitted */
 
-#include "cpps.h"
+#include "puppet.h"
 #include <vector>
 #include <algorithm>
 
@@ -54,110 +54,110 @@ public:
 };
 
 // Basic arithmetic tests
-CPPS_TEST(test_calculator_add) {
-    CPPS_ASSERT_EQUAL(5, Calculator::add(2, 3));
-    CPPS_ASSERT_EQUAL(0, Calculator::add(-5, 5));
-    CPPS_ASSERT_EQUAL(-10, Calculator::add(-3, -7));
+PUPPET_TEST(test_calculator_add) {
+    PUPPET_ASSERT_EQUAL(5, Calculator::add(2, 3));
+    PUPPET_ASSERT_EQUAL(0, Calculator::add(-5, 5));
+    PUPPET_ASSERT_EQUAL(-10, Calculator::add(-3, -7));
 }
 
-CPPS_TEST(test_calculator_subtract) {
-    CPPS_ASSERT_EQUAL(2, Calculator::subtract(5, 3));
-    CPPS_ASSERT_EQUAL(-8, Calculator::subtract(2, 10));
+PUPPET_TEST(test_calculator_subtract) {
+    PUPPET_ASSERT_EQUAL(2, Calculator::subtract(5, 3));
+    PUPPET_ASSERT_EQUAL(-8, Calculator::subtract(2, 10));
 }
 
-CPPS_TEST(test_calculator_multiply) {
-    CPPS_ASSERT_EQUAL(12, Calculator::multiply(3, 4));
-    CPPS_ASSERT_EQUAL(0, Calculator::multiply(0, 100));
-    CPPS_ASSERT_EQUAL(-20, Calculator::multiply(-4, 5));
+PUPPET_TEST(test_calculator_multiply) {
+    PUPPET_ASSERT_EQUAL(12, Calculator::multiply(3, 4));
+    PUPPET_ASSERT_EQUAL(0, Calculator::multiply(0, 100));
+    PUPPET_ASSERT_EQUAL(-20, Calculator::multiply(-4, 5));
 }
 
-CPPS_TEST(test_calculator_divide) {
-    CPPS_ASSERT_EQUAL(2.0, Calculator::divide(6.0, 3.0));
-    CPPS_ASSERT_EQUAL(0.5, Calculator::divide(1.0, 2.0));
+PUPPET_TEST(test_calculator_divide) {
+    PUPPET_ASSERT_EQUAL(2.0, Calculator::divide(6.0, 3.0));
+    PUPPET_ASSERT_EQUAL(0.5, Calculator::divide(1.0, 2.0));
 }
 
-CPPS_TEST(test_calculator_is_even) {
-    CPPS_ASSERT_TRUE(Calculator::isEven(2));
-    CPPS_ASSERT_TRUE(Calculator::isEven(0));
-    CPPS_ASSERT_TRUE(Calculator::isEven(-4));
-    CPPS_ASSERT_FALSE(Calculator::isEven(1));
-    CPPS_ASSERT_FALSE(Calculator::isEven(-3));
+PUPPET_TEST(test_calculator_is_even) {
+    PUPPET_ASSERT_TRUE(Calculator::isEven(2));
+    PUPPET_ASSERT_TRUE(Calculator::isEven(0));
+    PUPPET_ASSERT_TRUE(Calculator::isEven(-4));
+    PUPPET_ASSERT_FALSE(Calculator::isEven(1));
+    PUPPET_ASSERT_FALSE(Calculator::isEven(-3));
 }
 
 // Vector operation tests
-CPPS_TEST(test_vector_sum) {
+PUPPET_TEST(test_vector_sum) {
     std::vector<int> vec1 = {1, 2, 3, 4, 5};
-    CPPS_ASSERT_EQUAL(15, VectorOps::sum(vec1));
+    PUPPET_ASSERT_EQUAL(15, VectorOps::sum(vec1));
     
     std::vector<int> vec2 = {};
-    CPPS_ASSERT_EQUAL(0, VectorOps::sum(vec2));
+    PUPPET_ASSERT_EQUAL(0, VectorOps::sum(vec2));
     
     std::vector<int> vec3 = {-1, -2, -3};
-    CPPS_ASSERT_EQUAL(-6, VectorOps::sum(vec3));
+    PUPPET_ASSERT_EQUAL(-6, VectorOps::sum(vec3));
 }
 
-CPPS_TEST(test_vector_max) {
+PUPPET_TEST(test_vector_max) {
     std::vector<int> vec1 = {1, 5, 3, 9, 2};
-    CPPS_ASSERT_EQUAL(9, VectorOps::findMax(vec1));
+    PUPPET_ASSERT_EQUAL(9, VectorOps::findMax(vec1));
     
     std::vector<int> vec2 = {-10, -5, -20};
-    CPPS_ASSERT_EQUAL(-5, VectorOps::findMax(vec2));
+    PUPPET_ASSERT_EQUAL(-5, VectorOps::findMax(vec2));
 }
 
 // Test with GDB debugging helpers
-CPPS_TEST(test_with_detailed_gdb_tracking) {
-    cpps::gdb::checkpoint("=== Starting detailed GDB tracking test ===");
+PUPPET_TEST(test_with_detailed_gdb_tracking) {
+    puppet::gdb::checkpoint("=== Starting detailed GDB tracking test ===");
     
     std::vector<int> numbers = {10, 20, 30, 40, 50};
-    cpps::gdb::inspect("vector size", static_cast<int>(numbers.size()));
+    puppet::gdb::inspect("vector size", static_cast<int>(numbers.size()));
     
     int sum = 0;
     for (size_t i = 0; i < numbers.size(); ++i) {
-        cpps::gdb::inspect("loop index", static_cast<int>(i));
-        cpps::gdb::inspect("current value", numbers[i]);
+        puppet::gdb::inspect("loop index", static_cast<int>(i));
+        puppet::gdb::inspect("current value", numbers[i]);
         sum += numbers[i];
-        cpps::gdb::inspect("running sum", sum);
+        puppet::gdb::inspect("running sum", sum);
     }
     
-    cpps::gdb::breakpoint("SUM_CALCULATION_COMPLETE");
+    puppet::gdb::breakpoint("SUM_CALCULATION_COMPLETE");
     
-    CPPS_ASSERT_EQUAL(150, sum);
+    PUPPET_ASSERT_EQUAL(150, sum);
     
     int max = VectorOps::findMax(numbers);
-    cpps::gdb::inspect("max value", max);
-    CPPS_ASSERT_EQUAL(50, max);
+    puppet::gdb::inspect("max value", max);
+    PUPPET_ASSERT_EQUAL(50, max);
     
-    cpps::gdb::checkpoint("=== Completed detailed GDB tracking test ===");
+    puppet::gdb::checkpoint("=== Completed detailed GDB tracking test ===");
 }
 
 // Pointer tests
-CPPS_TEST(test_pointers) {
+PUPPET_TEST(test_pointers) {
     int value = 42;
     int* ptr = &value;
     int* nullPtr = nullptr;
     
-    CPPS_ASSERT_NOT_NULL(ptr);
-    CPPS_ASSERT_NULL(nullPtr);
-    CPPS_ASSERT_EQUAL(42, *ptr);
+    PUPPET_ASSERT_NOT_NULL(ptr);
+    PUPPET_ASSERT_NULL(nullPtr);
+    PUPPET_ASSERT_EQUAL(42, *ptr);
 }
 
 // Comparison tests
-CPPS_TEST(test_comparisons) {
-    CPPS_ASSERT_NOT_EQUAL(5, 3);
-    CPPS_ASSERT_NOT_EQUAL(0, 1);
+PUPPET_TEST(test_comparisons) {
+    PUPPET_ASSERT_NOT_EQUAL(5, 3);
+    PUPPET_ASSERT_NOT_EQUAL(0, 1);
     
     int a = 10;
     int b = 10;
-    CPPS_ASSERT_EQUAL(a, b);
+    PUPPET_ASSERT_EQUAL(a, b);
 }
 
 int main() {
     std::cout << "=================================================\n";
-    std::cout << "  CPPS Integration Tests\n";
-    std::cout << "  Testing CPPS Framework Functionality\n";
+    std::cout << "  Puppet++ Integration Tests\n";
+    std::cout << "  Testing Puppet++ Framework Functionality\n";
     std::cout << "=================================================\n\n";
     
-    int result = cpps::TestRunner::runAllTests(true);
+    int result = puppet::TestRunner::runAllTests(true);
     
     std::cout << "\n=================================================\n";
     if (result == 0) {

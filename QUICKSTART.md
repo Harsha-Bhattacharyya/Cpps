@@ -1,4 +1,4 @@
-# CPPS - Quick Reference Guide
+# Puppet++ - Quick Reference Guide
 
 ## Table of Contents
 1. [Basic Usage](#basic-usage)
@@ -12,20 +12,20 @@
 ### Minimal Test Example
 
 ```cpp
-#include "cpps.h"
+#include "puppet.h"
 
-CPPS_TEST(my_first_test) {
-    CPPS_ASSERT_EQUAL(4, 2 + 2);
+PUPPET_TEST(my_first_test) {
+    PUPPET_ASSERT_EQUAL(4, 2 + 2);
 }
 
 int main() {
-    return cpps::TestRunner::runAllTests(true);
+    return puppet::TestRunner::runAllTests(true);
 }
 ```
 
 Compile and run:
 ```bash
-g++ -std=c++17 -Iinclude -o my_test my_test.cpp src/cpps.cpp
+g++ -std=c++17 -Iinclude -o my_test my_test.cpp src/puppet.cpp
 ./my_test
 ```
 
@@ -35,80 +35,80 @@ g++ -std=c++17 -Iinclude -o my_test my_test.cpp src/cpps.cpp
 
 | Assertion | Description | Example |
 |-----------|-------------|---------|
-| `CPPS_ASSERT(condition)` | Assert condition is true | `CPPS_ASSERT(x > 0)` |
-| `CPPS_ASSERT_EQUAL(expected, actual)` | Assert equality | `CPPS_ASSERT_EQUAL(5, add(2, 3))` |
-| `CPPS_ASSERT_NOT_EQUAL(a, b)` | Assert inequality | `CPPS_ASSERT_NOT_EQUAL(5, 3)` |
-| `CPPS_ASSERT_TRUE(condition)` | Assert condition is true | `CPPS_ASSERT_TRUE(is_valid())` |
-| `CPPS_ASSERT_FALSE(condition)` | Assert condition is false | `CPPS_ASSERT_FALSE(is_empty())` |
-| `CPPS_ASSERT_NULL(ptr)` | Assert pointer is null | `CPPS_ASSERT_NULL(ptr)` |
-| `CPPS_ASSERT_NOT_NULL(ptr)` | Assert pointer is not null | `CPPS_ASSERT_NOT_NULL(&value)` |
+| `PUPPET_ASSERT(condition)` | Assert condition is true | `PUPPET_ASSERT(x > 0)` |
+| `PUPPET_ASSERT_EQUAL(expected, actual)` | Assert equality | `PUPPET_ASSERT_EQUAL(5, add(2, 3))` |
+| `PUPPET_ASSERT_NOT_EQUAL(a, b)` | Assert inequality | `PUPPET_ASSERT_NOT_EQUAL(5, 3)` |
+| `PUPPET_ASSERT_TRUE(condition)` | Assert condition is true | `PUPPET_ASSERT_TRUE(is_valid())` |
+| `PUPPET_ASSERT_FALSE(condition)` | Assert condition is false | `PUPPET_ASSERT_FALSE(is_empty())` |
+| `PUPPET_ASSERT_NULL(ptr)` | Assert pointer is null | `PUPPET_ASSERT_NULL(ptr)` |
+| `PUPPET_ASSERT_NOT_NULL(ptr)` | Assert pointer is not null | `PUPPET_ASSERT_NOT_NULL(&value)` |
 
 ### Assertion Examples
 
 ```cpp
 // Numeric assertions
-CPPS_ASSERT_EQUAL(10, calculate_sum(3, 7));
-CPPS_ASSERT_NOT_EQUAL(0, get_count());
+PUPPET_ASSERT_EQUAL(10, calculate_sum(3, 7));
+PUPPET_ASSERT_NOT_EQUAL(0, get_count());
 
 // Boolean assertions
-CPPS_ASSERT_TRUE(validate_input("hello"));
-CPPS_ASSERT_FALSE(is_empty(container));
+PUPPET_ASSERT_TRUE(validate_input("hello"));
+PUPPET_ASSERT_FALSE(is_empty(container));
 
 // Pointer assertions
 int* ptr = get_pointer();
-CPPS_ASSERT_NOT_NULL(ptr);
-CPPS_ASSERT_EQUAL(42, *ptr);
+PUPPET_ASSERT_NOT_NULL(ptr);
+PUPPET_ASSERT_EQUAL(42, *ptr);
 
 // Condition assertions
-CPPS_ASSERT(x > 0 && x < 100);
-CPPS_ASSERT(list.size() == 5);
+PUPPET_ASSERT(x > 0 && x < 100);
+PUPPET_ASSERT(list.size() == 5);
 ```
 
 ## GDB Integration
 
 ### GDB Helper Functions
 
-CPPS provides three helper functions for GDB integration:
+Puppet++ provides three helper functions for GDB integration:
 
 #### 1. checkpoint() - Mark execution points
 
 ```cpp
-CPPS_TEST(test_with_checkpoints) {
-    cpps::gdb::checkpoint("Starting initialization");
+PUPPET_TEST(test_with_checkpoints) {
+    puppet::gdb::checkpoint("Starting initialization");
     initialize_system();
     
-    cpps::gdb::checkpoint("Beginning computation");
+    puppet::gdb::checkpoint("Beginning computation");
     int result = compute();
     
-    cpps::gdb::checkpoint("Validation phase");
-    CPPS_ASSERT(result > 0);
+    puppet::gdb::checkpoint("Validation phase");
+    PUPPET_ASSERT(result > 0);
 }
 ```
 
 #### 2. inspect() - Log variable values
 
 ```cpp
-CPPS_TEST(test_with_inspection) {
+PUPPET_TEST(test_with_inspection) {
     int x = 10;
     int y = 20;
-    cpps::gdb::inspect("x", x);
-    cpps::gdb::inspect("y", y);
+    puppet::gdb::inspect("x", x);
+    puppet::gdb::inspect("y", y);
     
     int sum = x + y;
-    cpps::gdb::inspect("sum", sum);
-    CPPS_ASSERT_EQUAL(30, sum);
+    puppet::gdb::inspect("sum", sum);
+    PUPPET_ASSERT_EQUAL(30, sum);
 }
 ```
 
 #### 3. breakpoint() - Custom breakpoint markers
 
 ```cpp
-CPPS_TEST(test_with_breakpoints) {
+PUPPET_TEST(test_with_breakpoints) {
     initialize_data();
-    cpps::gdb::breakpoint("AFTER_INIT");
+    puppet::gdb::breakpoint("AFTER_INIT");
     
     process_data();
-    cpps::gdb::breakpoint("AFTER_PROCESS");
+    puppet::gdb::breakpoint("AFTER_PROCESS");
     
     validate_results();
 }
@@ -117,8 +117,8 @@ CPPS_TEST(test_with_breakpoints) {
 ### Using with GDB
 
 ```bash
-# Compile with debug symbols (automatic with CPPS Makefile)
-g++ -g -std=c++17 -Iinclude -o my_test my_test.cpp src/cpps.cpp
+# Compile with debug symbols (automatic with Puppet++ Makefile)
+g++ -g -std=c++17 -Iinclude -o my_test my_test.cpp src/puppet.cpp
 
 # Start GDB
 gdb ./my_test
@@ -128,7 +128,7 @@ gdb ./my_test
 (gdb) run
 
 # Or break on specific output
-(gdb) break cpps.h:178  # Line where checkpoint prints
+(gdb) break puppet.h:178  # Line where checkpoint prints
 ```
 
 ## Building and Running Tests
@@ -136,7 +136,7 @@ gdb ./my_test
 ### Using the Makefile
 
 ```bash
-# Build the CPPS framework
+# Build the Puppet++ framework
 make
 
 # Build example tests
@@ -154,11 +154,11 @@ make clean
 ```bash
 # Single test file
 g++ -std=c++17 -Wall -Wextra -Iinclude \
-    -o my_test my_test.cpp src/cpps.cpp
+    -o my_test my_test.cpp src/puppet.cpp
 
 # Multiple test files
 g++ -std=c++17 -Wall -Wextra -Iinclude \
-    -o all_tests test1.cpp test2.cpp src/cpps.cpp
+    -o all_tests test1.cpp test2.cpp src/puppet.cpp
 ```
 
 ### Command Line Options
@@ -182,16 +182,16 @@ public:
     int multiply(int a, int b) { return a * b; }
 };
 
-CPPS_TEST(test_calculator_add) {
+PUPPET_TEST(test_calculator_add) {
     Calculator calc;
-    CPPS_ASSERT_EQUAL(5, calc.add(2, 3));
-    CPPS_ASSERT_EQUAL(-2, calc.add(-5, 3));
+    PUPPET_ASSERT_EQUAL(5, calc.add(2, 3));
+    PUPPET_ASSERT_EQUAL(-2, calc.add(-5, 3));
 }
 
-CPPS_TEST(test_calculator_multiply) {
+PUPPET_TEST(test_calculator_multiply) {
     Calculator calc;
-    CPPS_ASSERT_EQUAL(6, calc.multiply(2, 3));
-    CPPS_ASSERT_EQUAL(0, calc.multiply(0, 100));
+    PUPPET_ASSERT_EQUAL(6, calc.multiply(2, 3));
+    PUPPET_ASSERT_EQUAL(0, calc.multiply(0, 100));
 }
 ```
 
@@ -199,13 +199,13 @@ CPPS_TEST(test_calculator_multiply) {
 
 ```cpp
 // Simple pattern using local variables
-CPPS_TEST(test_with_setup) {
+PUPPET_TEST(test_with_setup) {
     // Setup
     std::vector<int> data = {1, 2, 3, 4, 5};
     
     // Test
     int sum = std::accumulate(data.begin(), data.end(), 0);
-    CPPS_ASSERT_EQUAL(15, sum);
+    PUPPET_ASSERT_EQUAL(15, sum);
     
     // Teardown (automatic with RAII)
 }
@@ -214,7 +214,7 @@ CPPS_TEST(test_with_setup) {
 ### Testing Exceptions
 
 ```cpp
-CPPS_TEST(test_exception_handling) {
+PUPPET_TEST(test_exception_handling) {
     // Test that function throws expected exception
     bool caught = false;
     try {
@@ -222,20 +222,20 @@ CPPS_TEST(test_exception_handling) {
     } catch (const std::runtime_error& e) {
         caught = true;
     }
-    CPPS_ASSERT_TRUE(caught);
+    PUPPET_ASSERT_TRUE(caught);
 }
 ```
 
 ### Multiple Assertions in One Test
 
 ```cpp
-CPPS_TEST(test_multiple_conditions) {
+PUPPET_TEST(test_multiple_conditions) {
     std::vector<int> vec = {1, 2, 3};
     
-    CPPS_ASSERT_EQUAL(3, static_cast<int>(vec.size()));
-    CPPS_ASSERT_EQUAL(1, vec[0]);
-    CPPS_ASSERT_EQUAL(3, vec[2]);
-    CPPS_ASSERT_FALSE(vec.empty());
+    PUPPET_ASSERT_EQUAL(3, static_cast<int>(vec.size()));
+    PUPPET_ASSERT_EQUAL(1, vec[0]);
+    PUPPET_ASSERT_EQUAL(3, vec[2]);
+    PUPPET_ASSERT_FALSE(vec.empty());
 }
 ```
 
@@ -243,35 +243,35 @@ CPPS_TEST(test_multiple_conditions) {
 
 **file: test_math.cpp**
 ```cpp
-#include "cpps.h"
+#include "puppet.h"
 
-CPPS_TEST(test_add) {
-    CPPS_ASSERT_EQUAL(5, 2 + 3);
+PUPPET_TEST(test_add) {
+    PUPPET_ASSERT_EQUAL(5, 2 + 3);
 }
 ```
 
 **file: test_string.cpp**
 ```cpp
-#include "cpps.h"
+#include "puppet.h"
 
-CPPS_TEST(test_concat) {
-    CPPS_ASSERT_EQUAL(std::string("hello"), std::string("hel") + "lo");
+PUPPET_TEST(test_concat) {
+    PUPPET_ASSERT_EQUAL(std::string("hello"), std::string("hel") + "lo");
 }
 ```
 
 **file: main.cpp**
 ```cpp
-#include "cpps.h"
+#include "puppet.h"
 
 int main() {
-    return cpps::TestRunner::runAllTests(true);
+    return puppet::TestRunner::runAllTests(true);
 }
 ```
 
 Compile all together:
 ```bash
 g++ -std=c++17 -Iinclude -o all_tests \
-    test_math.cpp test_string.cpp main.cpp src/cpps.cpp
+    test_math.cpp test_string.cpp main.cpp src/puppet.cpp
 ```
 
 ## Best Practices
@@ -287,7 +287,7 @@ g++ -std=c++17 -Iinclude -o all_tests \
 ## Example: Complete Test Suite
 
 ```cpp
-#include "cpps.h"
+#include "puppet.h"
 #include <vector>
 
 class Stack {
@@ -303,33 +303,33 @@ public:
     size_t size() const { return data.size(); }
 };
 
-CPPS_TEST(test_stack_push) {
+PUPPET_TEST(test_stack_push) {
     Stack s;
     s.push(10);
-    CPPS_ASSERT_EQUAL(1, static_cast<int>(s.size()));
-    CPPS_ASSERT_FALSE(s.empty());
+    PUPPET_ASSERT_EQUAL(1, static_cast<int>(s.size()));
+    PUPPET_ASSERT_FALSE(s.empty());
 }
 
-CPPS_TEST(test_stack_pop) {
+PUPPET_TEST(test_stack_pop) {
     Stack s;
     s.push(10);
     s.push(20);
-    CPPS_ASSERT_EQUAL(20, s.pop());
-    CPPS_ASSERT_EQUAL(10, s.pop());
-    CPPS_ASSERT_TRUE(s.empty());
+    PUPPET_ASSERT_EQUAL(20, s.pop());
+    PUPPET_ASSERT_EQUAL(10, s.pop());
+    PUPPET_ASSERT_TRUE(s.empty());
 }
 
-CPPS_TEST(test_stack_empty) {
+PUPPET_TEST(test_stack_empty) {
     Stack s;
-    CPPS_ASSERT_TRUE(s.empty());
+    PUPPET_ASSERT_TRUE(s.empty());
     s.push(1);
-    CPPS_ASSERT_FALSE(s.empty());
+    PUPPET_ASSERT_FALSE(s.empty());
     s.pop();
-    CPPS_ASSERT_TRUE(s.empty());
+    PUPPET_ASSERT_TRUE(s.empty());
 }
 
 int main() {
-    return cpps::TestRunner::runAllTests(true);
+    return puppet::TestRunner::runAllTests(true);
 }
 ```
 
@@ -338,12 +338,12 @@ int main() {
 ### Common Issues
 
 1. **Linker errors about undefined references**
-   - Make sure to link with `src/cpps.cpp`
-   - Example: `g++ -o test my_test.cpp src/cpps.cpp`
+   - Make sure to link with `src/puppet.cpp`
+   - Example: `g++ -o test my_test.cpp src/puppet.cpp`
 
 2. **Tests not running**
-   - Ensure you call `cpps::TestRunner::runAllTests()` in main
-   - Check that tests are defined with `CPPS_TEST` macro
+   - Ensure you call `puppet::TestRunner::runAllTests()` in main
+   - Check that tests are defined with `PUPPET_TEST` macro
 
 3. **Compilation errors with assertions**
    - Make sure types are comparable with `<<` operator for output

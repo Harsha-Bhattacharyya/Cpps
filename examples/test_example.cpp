@@ -21,7 +21,7 @@ such copyright holder that are necessarily infringed by their contribution(s)
 alone or by combination of their contribution(s) with the software to which such
 contribution(s) was submitted */
 
-#include "cpps.h"
+#include "puppet.h"
 #include <vector>
 #include <string>
 
@@ -38,70 +38,70 @@ std::string concatenate(const std::string& a, const std::string& b) {
     return a + b;
 }
 
-// Example tests using CPPS framework
-CPPS_TEST(test_add_positive_numbers) {
-    CPPS_ASSERT_EQUAL(5, add(2, 3));
-    CPPS_ASSERT_EQUAL(10, add(7, 3));
+// Example tests using Puppet++ framework
+PUPPET_TEST(test_add_positive_numbers) {
+    PUPPET_ASSERT_EQUAL(5, add(2, 3));
+    PUPPET_ASSERT_EQUAL(10, add(7, 3));
 }
 
-CPPS_TEST(test_add_negative_numbers) {
-    CPPS_ASSERT_EQUAL(-5, add(-2, -3));
-    CPPS_ASSERT_EQUAL(0, add(-5, 5));
+PUPPET_TEST(test_add_negative_numbers) {
+    PUPPET_ASSERT_EQUAL(-5, add(-2, -3));
+    PUPPET_ASSERT_EQUAL(0, add(-5, 5));
 }
 
-CPPS_TEST(test_multiply) {
-    CPPS_ASSERT_EQUAL(6, multiply(2, 3));
-    CPPS_ASSERT_EQUAL(0, multiply(0, 100));
-    CPPS_ASSERT_EQUAL(-10, multiply(-2, 5));
+PUPPET_TEST(test_multiply) {
+    PUPPET_ASSERT_EQUAL(6, multiply(2, 3));
+    PUPPET_ASSERT_EQUAL(0, multiply(0, 100));
+    PUPPET_ASSERT_EQUAL(-10, multiply(-2, 5));
 }
 
-CPPS_TEST(test_string_concatenation) {
-    CPPS_ASSERT_EQUAL(std::string("HelloWorld"), concatenate("Hello", "World"));
-    CPPS_ASSERT_EQUAL(std::string(""), concatenate("", ""));
+PUPPET_TEST(test_string_concatenation) {
+    PUPPET_ASSERT_EQUAL(std::string("HelloWorld"), concatenate("Hello", "World"));
+    PUPPET_ASSERT_EQUAL(std::string(""), concatenate("", ""));
 }
 
-CPPS_TEST(test_boolean_assertions) {
-    CPPS_ASSERT_TRUE(true);
-    CPPS_ASSERT_FALSE(false);
-    CPPS_ASSERT_TRUE(5 > 3);
-    CPPS_ASSERT_FALSE(5 < 3);
+PUPPET_TEST(test_boolean_assertions) {
+    PUPPET_ASSERT_TRUE(true);
+    PUPPET_ASSERT_FALSE(false);
+    PUPPET_ASSERT_TRUE(5 > 3);
+    PUPPET_ASSERT_FALSE(5 < 3);
 }
 
-CPPS_TEST(test_null_pointer) {
+PUPPET_TEST(test_null_pointer) {
     int* nullPtr = nullptr;
     int value = 42;
     int* nonNullPtr = &value;
     
-    CPPS_ASSERT_NULL(nullPtr);
-    CPPS_ASSERT_NOT_NULL(nonNullPtr);
+    PUPPET_ASSERT_NULL(nullPtr);
+    PUPPET_ASSERT_NOT_NULL(nonNullPtr);
 }
 
-CPPS_TEST(test_with_gdb_helpers) {
+PUPPET_TEST(test_with_gdb_helpers) {
     // This test demonstrates GDB integration features
-    cpps::gdb::checkpoint("Starting test_with_gdb_helpers");
+    puppet::gdb::checkpoint("Starting test_with_gdb_helpers");
     
     int x = 10;
     int y = 20;
     
-    cpps::gdb::inspect("x", x);
-    cpps::gdb::inspect("y", y);
+    puppet::gdb::inspect("x", x);
+    puppet::gdb::inspect("y", y);
     
     int result = add(x, y);
-    cpps::gdb::inspect("result", result);
+    puppet::gdb::inspect("result", result);
     
-    CPPS_ASSERT_EQUAL(30, result);
+    PUPPET_ASSERT_EQUAL(30, result);
     
-    cpps::gdb::checkpoint("Completed test_with_gdb_helpers");
+    puppet::gdb::checkpoint("Completed test_with_gdb_helpers");
 }
 
 // Example of a test that would fail (commented out to not break CI)
 /*
-CPPS_TEST(test_intentional_failure) {
-    CPPS_ASSERT_EQUAL(10, add(2, 3));  // This will fail: 5 != 10
+PUPPET_TEST(test_intentional_failure) {
+    PUPPET_ASSERT_EQUAL(10, add(2, 3));  // This will fail: 5 != 10
 }
 */
 
 // Main function that runs all tests
 int main() {
-    return cpps::TestRunner::runAllTests(true);
+    return puppet::TestRunner::runAllTests(true);
 }

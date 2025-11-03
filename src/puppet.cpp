@@ -21,11 +21,11 @@ such copyright holder that are necessarily infringed by their contribution(s)
 alone or by combination of their contribution(s) with the software to which such
 contribution(s) was submitted */
 
-#include "cpps.h"
+#include "puppet.h"
 #include <iostream>
 #include <iomanip>
 
-namespace cpps {
+namespace puppet {
 
 std::unique_ptr<TestRegistry> TestRegistry::instance = nullptr;
 
@@ -138,4 +138,4 @@ int TestRunner::getFailureCount() {
     return failed;
 }
 
-} // namespace cpps
+} // namespace puppet

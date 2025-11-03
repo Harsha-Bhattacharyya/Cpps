@@ -21,8 +21,8 @@ such copyright holder that are necessarily infringed by their contribution(s)
 alone or by combination of their contribution(s) with the software to which such
 contribution(s) was submitted */
 
-#ifndef CPPS_H
-#define CPPS_H
+#ifndef PUPPET_H
+#define PUPPET_H
 
 #include <string>
 #include <vector>
@@ -31,7 +31,7 @@ contribution(s) was submitted */
 #include <sstream>
 #include <memory>
 
-namespace cpps {
+namespace puppet {
 
 // Test result structure
 struct TestResult {
@@ -99,67 +99,67 @@ public:
 };
 
 // Assertion macros
-#define CPPS_ASSERT(condition) \
+#define PUPPET_ASSERT(condition) \
     do { \
         if (!(condition)) { \
             std::stringstream ss; \
             ss << "Assertion failed: " << #condition \
                << " at " << __FILE__ << ":" << __LINE__; \
-            throw cpps::AssertionFailure(ss.str()); \
+            throw puppet::AssertionFailure(ss.str()); \
         } \
     } while(0)
 
-#define CPPS_ASSERT_EQUAL(expected, actual) \
+#define PUPPET_ASSERT_EQUAL(expected, actual) \
     do { \
         if ((expected) != (actual)) { \
             std::stringstream ss; \
             ss << "Assertion failed: expected " << (expected) \
                << " but got " << (actual) \
                << " at " << __FILE__ << ":" << __LINE__; \
-            throw cpps::AssertionFailure(ss.str()); \
+            throw puppet::AssertionFailure(ss.str()); \
         } \
     } while(0)
 
-#define CPPS_ASSERT_NOT_EQUAL(expected, actual) \
+#define PUPPET_ASSERT_NOT_EQUAL(expected, actual) \
     do { \
         if ((expected) == (actual)) { \
             std::stringstream ss; \
             ss << "Assertion failed: expected not equal to " << (expected) \
                << " at " << __FILE__ << ":" << __LINE__; \
-            throw cpps::AssertionFailure(ss.str()); \
+            throw puppet::AssertionFailure(ss.str()); \
         } \
     } while(0)
 
-#define CPPS_ASSERT_TRUE(condition) CPPS_ASSERT(condition)
-#define CPPS_ASSERT_FALSE(condition) CPPS_ASSERT(!(condition))
+#define PUPPET_ASSERT_TRUE(condition) PUPPET_ASSERT(condition)
+#define PUPPET_ASSERT_FALSE(condition) PUPPET_ASSERT(!(condition))
 
-#define CPPS_ASSERT_NULL(ptr) \
+#define PUPPET_ASSERT_NULL(ptr) \
     do { \
         if ((ptr) != nullptr) { \
             std::stringstream ss; \
             ss << "Assertion failed: expected nullptr but got non-null pointer" \
                << " at " << __FILE__ << ":" << __LINE__; \
-            throw cpps::AssertionFailure(ss.str()); \
+            throw puppet::AssertionFailure(ss.str()); \
         } \
     } while(0)
 
-#define CPPS_ASSERT_NOT_NULL(ptr) \
+#define PUPPET_ASSERT_NOT_NULL(ptr) \
     do { \
         if ((ptr) == nullptr) { \
             std::stringstream ss; \
             ss << "Assertion failed: expected non-null pointer but got nullptr" \
                << " at " << __FILE__ << ":" << __LINE__; \
-            throw cpps::AssertionFailure(ss.str()); \
+            throw puppet::AssertionFailure(ss.str()); \
         } \
     } while(0)
 
 // Test registration macro
-#define CPPS_TEST(testName) \
+#define PUPPET_TEST(testName) \
     void testName(); \
     namespace { \
         struct TestRegistrar_##testName { \
             TestRegistrar_##testName() { \
-                cpps::TestRegistry::getInstance().registerTest( \
+                puppet::TestRegistry::getInstance().registerTest( \
                     #testName, testName, __FILE__, __LINE__); \
             } \
         }; \
@@ -170,22 +170,22 @@ public:
 // GDB Helper functions
 namespace gdb {
     // Breakpoint helper - prints message that can be used as GDB breakpoint marker
-    inline void breakpoint(const std::string& marker = "CPPS_BREAKPOINT") {
-        std::cout << "[CPPS GDB] " << marker << std::endl;
+    inline void breakpoint(const std::string& marker = "PUPPET_BREAKPOINT") {
+        std::cout << "[PUPPET++ GDB] " << marker << std::endl;
     }
 
     // Print variable for GDB inspection
     template<typename T>
     inline void inspect(const std::string& name, const T& value) {
-        std::cout << "[CPPS GDB INSPECT] " << name << " = " << value << std::endl;
+        std::cout << "[PUPPET++ GDB INSPECT] " << name << " = " << value << std::endl;
     }
 
     // Checkpoint for GDB - useful for stepping through tests
     inline void checkpoint(const std::string& description) {
-        std::cout << "[CPPS GDB CHECKPOINT] " << description << std::endl;
+        std::cout << "[PUPPET++ GDB CHECKPOINT] " << description << std::endl;
     }
 }
 
-} // namespace cpps
+} // namespace puppet
 
-#endif // CPPS_H
+#endif // PUPPET_H

@@ -1,6 +1,6 @@
 # Build artifacts
 *.o
-cpps
+puppet++
 test_example
 integration_test
 

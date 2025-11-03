@@ -1,12 +1,12 @@
-# Using CPPS with GDB
+# Using Puppet++ with GDB
 
-CPPS is designed to work seamlessly with GDB for enhanced debugging of unit tests. This guide shows how to leverage both tools together.
+Puppet++ is designed to work seamlessly with GDB for enhanced debugging of unit tests. This guide shows how to leverage both tools together.
 
-## Basic GDB Usage with CPPS
+## Basic GDB Usage with Puppet++
 
 ### 1. Compile with Debug Symbols
 
-CPPS automatically compiles with `-g` flag for debug symbols. Build your tests:
+Puppet++ automatically compiles with `-g` flag for debug symbols. Build your tests:
 
 ```bash
 make example
@@ -18,7 +18,7 @@ make example
 gdb ./test_example
 ```
 
-### 3. Common GDB Commands for CPPS Tests
+### 3. Common GDB Commands for Puppet++ Tests
 
 ```gdb
 # Run the program
@@ -45,48 +45,48 @@ gdb ./test_example
 (gdb) backtrace
 ```
 
-## Using CPPS GDB Helpers
+## Using Puppet++ GDB Helpers
 
-CPPS provides special helper functions that print markers useful for GDB debugging:
+Puppet++ provides special helper functions that print markers useful for GDB debugging:
 
-### cpps::gdb::checkpoint()
+### puppet::gdb::checkpoint()
 
 Creates a checkpoint in your test execution:
 
 ```cpp
-CPPS_TEST(my_test) {
-    cpps::gdb::checkpoint("Before computation");
+PUPPET_TEST(my_test) {
+    puppet::gdb::checkpoint("Before computation");
     int result = compute_something();
-    cpps::gdb::checkpoint("After computation");
-    CPPS_ASSERT_EQUAL(42, result);
+    puppet::gdb::checkpoint("After computation");
+    PUPPET_ASSERT_EQUAL(42, result);
 }
 ```
 
-### cpps::gdb::inspect()
+### puppet::gdb::inspect()
 
 Prints variable values with labels:
 
 ```cpp
-CPPS_TEST(my_test) {
+PUPPET_TEST(my_test) {
     int x = 10;
     int y = 20;
-    cpps::gdb::inspect("x", x);
-    cpps::gdb::inspect("y", y);
+    puppet::gdb::inspect("x", x);
+    puppet::gdb::inspect("y", y);
     int sum = x + y;
-    cpps::gdb::inspect("sum", sum);
+    puppet::gdb::inspect("sum", sum);
 }
 ```
 
-### cpps::gdb::breakpoint()
+### puppet::gdb::breakpoint()
 
 Creates a labeled breakpoint marker:
 
 ```cpp
-CPPS_TEST(my_test) {
+PUPPET_TEST(my_test) {
     int x = initialize_data();
-    cpps::gdb::breakpoint("AFTER_INIT");
+    puppet::gdb::breakpoint("AFTER_INIT");
     process_data(x);
-    cpps::gdb::breakpoint("AFTER_PROCESS");
+    puppet::gdb::breakpoint("AFTER_PROCESS");
 }
 ```
 
@@ -99,7 +99,7 @@ Set breakpoints that only trigger under certain conditions:
 (gdb) break test_example.cpp:45 if result == 0
 
 # Break when an assertion is about to fail
-(gdb) break cpps.h:103
+(gdb) break puppet.h:103
 ```
 
 ## Debugging Failed Tests
@@ -132,7 +132,7 @@ gdb ./test_example
 ## Example: Debugging a Complex Test
 
 ```cpp
-#include "cpps.h"
+#include "puppet.h"
 
 struct ComplexData {
     int value;
@@ -146,25 +146,25 @@ ComplexData process(int input) {
     return data;
 }
 
-CPPS_TEST(test_complex_processing) {
-    cpps::gdb::checkpoint("Starting complex test");
+PUPPET_TEST(test_complex_processing) {
+    puppet::gdb::checkpoint("Starting complex test");
     
     for (int i = -2; i <= 2; ++i) {
-        cpps::gdb::inspect("iteration", i);
+        puppet::gdb::inspect("iteration", i);
         
         ComplexData result = process(i);
         
-        cpps::gdb::inspect("result.value", result.value);
-        cpps::gdb::inspect("result.valid", result.valid);
+        puppet::gdb::inspect("result.value", result.value);
+        puppet::gdb::inspect("result.valid", result.valid);
         
         if (i > 0) {
-            CPPS_ASSERT_TRUE(result.valid);
+            PUPPET_ASSERT_TRUE(result.valid);
         } else {
-            CPPS_ASSERT_FALSE(result.valid);
+            PUPPET_ASSERT_FALSE(result.valid);
         }
     }
     
-    cpps::gdb::checkpoint("Completed complex test");
+    puppet::gdb::checkpoint("Completed complex test");
 }
 ```
 
@@ -181,14 +181,14 @@ GDB session:
 
 ## Tips
 
-1. Use `cpps::gdb::checkpoint()` at the start and end of complex tests
-2. Use `cpps::gdb::inspect()` to log intermediate values
-3. Use `cpps::gdb::breakpoint()` with custom markers for specific debugging points
-4. Combine CPPS output with GDB's `watch` command to monitor variable changes
+1. Use `puppet::gdb::checkpoint()` at the start and end of complex tests
+2. Use `puppet::gdb::inspect()` to log intermediate values
+3. Use `puppet::gdb::breakpoint()` with custom markers for specific debugging points
+4. Combine Puppet++ output with GDB's `watch` command to monitor variable changes
 5. Use GDB's `catch throw` to break on assertion failures
 
 ## Further Reading
 
 - GDB Documentation: https://www.gnu.org/software/gdb/documentation/
 - GDB Tutorial: https://www.cs.cmu.edu/~gilpin/tutorial/
-- CPPS Examples: See `examples/` directory
+- Puppet++ Examples: See `examples/` directory
