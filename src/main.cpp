@@ -21,66 +21,35 @@ such copyright holder that are necessarily infringed by their contribution(s)
 alone or by combination of their contribution(s) with the software to which such
 contribution(s) was submitted */
 
-#include "lexer.h"
-#include "parser.h"
-#include "llvm/Support/MemoryBuffer.h"
-#include "llvm/Support/SourceMgr.h"
-#include "llvm/Support/raw_ostream.h"
-#include <fstream>
+#include "cpps.h"
 #include <iostream>
 
-int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        llvm::errs() << "Usage: " << argv[0] << " <input.cpps> [-o output.js]\n";
-        return 1;
-    }
-
-    // Read input file
-    std::ifstream inFile(argv[1]);
-    if (!inFile) {
-        llvm::errs() << "Error: Could not open file: " << argv[1] << "\n";
-        return 1;
-    }
-    std::string input((std::istreambuf_iterator<char>(inFile)),
-                std::istreambuf_iterator<char>());
-    inFile.close();
-
-    // Parse output filename
-    std::string outputFile = "a.js";
+// Main function for the test runner
+// When using CPPS as a library, tests are defined in separate files
+// and automatically registered via CPPS_TEST macro
+int main(int argc, char* argv[]) {
+    bool verbose = true;
+    
+    // Parse command line arguments
     for (int i = 1; i < argc; ++i) {
-        if (std::string(argv[i]) == "-o" && i + 1 < argc) {
-            outputFile = argv[i + 1];
-            break;
+        std::string arg = argv[i];
+        if (arg == "--quiet" || arg == "-q") {
+            verbose = false;
+        } else if (arg == "--help" || arg == "-h") {
+            std::cout << "CPPS - C++ Unit Testing Framework\n";
+            std::cout << "Usage: " << argv[0] << " [options]\n";
+            std::cout << "Options:\n";
+            std::cout << "  -q, --quiet    Quiet mode (less verbose output)\n";
+            std::cout << "  -h, --help     Show this help message\n";
+            return 0;
         }
     }
-
-    // Initialize components
-    llvm::SourceMgr sm;
-    auto buffer = llvm::MemoryBuffer::getMemBuffer(input);
-    sm.AddNewSourceBuffer(std::move(buffer), llvm::SMLoc());
-
-    Lexer lex(sm, input);
-    Parser parser(lex);
-
-    // Process input
-    lex.tokenize();
-    parser.parse();
-
-    // Write output
-    std::ofstream outFile(outputFile);
-    if (!outFile) {
-        llvm::errs() << "Error: Could not open output file: " << outputFile << "\n";
-        return 1;
-    }
-
-    if (auto root = parser.getRootASTNode()) {
-        outFile << root->toJS() << "\n";
-        llvm::errs() << "Success: Output written to " << outputFile << "\n";
-    } else {
-        outFile << "// Error: No AST generated\n";
-        llvm::errs() << "Warning: No AST generated (invalid input?)\n";
-    }
-
-    outFile.close();
-    return 0;
+    
+    std::cout << "CPPS - C++ Unit Testing Framework\n";
+    std::cout << "Complementing GDB for better C++ testing\n\n";
+    
+    // Run all registered tests
+    int failures = cpps::TestRunner::runAllTests(verbose);
+    
+    return failures;
 }
