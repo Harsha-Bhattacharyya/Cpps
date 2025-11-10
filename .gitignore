@@ -1,10 +1,26 @@
-#GITIGNORE
+# Build artifacts
+*.o
+puppet++
+test_example
+integration_test
 
+# Old transpiler artifacts
 input.cpps
 a.js
-cpps
-src/lexer.o
-src/parser.o
-src/main.o
-repo-to-text_*.txt
+
+# Dependencies
 eigen-*
+
+# Temporary files
+repo-to-text_*.txt
+
+# Editor files
+*.swp
+*~
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
